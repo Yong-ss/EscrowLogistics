@@ -18,6 +18,23 @@ Install these first (the same tools used in the course labs):
 
 ---
 
+## Installation
+
+Clone the repo and install the npm dependencies (this project uses
+[Express](https://expressjs.com/) to serve the frontend):
+
+```bash
+git clone https://github.com/Yong-ss/EscrowLogistics.git
+cd EscrowLogistics
+npm install
+```
+
+No environment variables or config files are required — the only configuration
+needed is pasting the deployed contract address into `src/js/abi.js` (see
+Step 3 below).
+
+---
+
 ## Project structure
 
 ```
