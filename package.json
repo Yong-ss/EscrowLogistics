@@ -1,0 +1,12 @@
+{
+  "name": "escrow-logistics-dapp",
+  "version": "1.0.0",
+  "description": "Decentralized Escrow and Milestone-Based Logistics Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

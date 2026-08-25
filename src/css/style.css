@@ -1,0 +1,131 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0 20px 40px;
+  background: #f4f6f8;
+  color: #222;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 16px 0;
+  border-bottom: 2px solid #2c6e91;
+  margin-bottom: 20px;
+}
+
+header h1 {
+  font-size: 20px;
+  color: #2c6e91;
+  margin: 0;
+}
+
+#account {
+  margin-left: 10px;
+  font-family: monospace;
+  font-size: 13px;
+}
+
+section {
+  background: #fff;
+  border: 1px solid #dde3e8;
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+section h2 {
+  font-size: 16px;
+  margin-top: 0;
+  color: #2c6e91;
+}
+
+label {
+  display: block;
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+input {
+  width: 260px;
+  padding: 6px 8px;
+  margin-left: 6px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+}
+
+button {
+  background: #2c6e91;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  margin: 6px 6px 6px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background: #21536e;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid #dde3e8;
+  padding: 8px;
+  text-align: left;
+  font-size: 13px;
+}
+
+th {
+  background: #eef3f6;
+}
+
+#agreementDetails {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+#status {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #21536e;
+  color: #fff;
+  padding: 8px 20px;
+  font-size: 13px;
+  min-height: 18px;
+}
+
+/* utility: hide role-specific panels until we know who is connected */
+.hidden {
+  display: none;
+}
+
+/* role badge in the header */
+.badge {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 3px 10px;
+  background: #e0a800;
+  color: #fff;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* explanatory hint text in the carrier dashboard */
+.hint {
+  color: #666;
+  font-size: 13px;
+  font-style: italic;
+}
