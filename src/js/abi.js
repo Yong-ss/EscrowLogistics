@@ -4,7 +4,7 @@
 // paste the deployed contract address between the quotes below.
 // The ABI is already filled in from the compiled contract - no need to change it.
 
-const CONTRACT_ADDRESS = "0x43fd4C65AB79F04E76fA31Fc711A3A08e576AaA4";
+const CONTRACT_ADDRESS = "0xD7d8De83BAF87339e020233C3603B079A62879B5";
 
 const CONTRACT_ABI = [
   {
@@ -45,6 +45,12 @@ const CONTRACT_ABI = [
         "indexed": false,
         "internalType": "uint256",
         "name": "milestoneCount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "declaredPayloadValue",
         "type": "uint256"
       },
       {
@@ -218,6 +224,11 @@ const CONTRACT_ABI = [
         "internalType": "enum EscrowLogistics.Status",
         "name": "status",
         "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "declaredPayloadValue",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -233,6 +244,11 @@ const CONTRACT_ABI = [
       {
         "internalType": "uint256",
         "name": "_milestoneCount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_declaredPayloadValue",
         "type": "uint256"
       },
       {
@@ -340,6 +356,11 @@ const CONTRACT_ABI = [
             "internalType": "enum EscrowLogistics.Status",
             "name": "status",
             "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "declaredPayloadValue",
+            "type": "uint256"
           }
         ],
         "internalType": "struct EscrowLogistics.Agreement",

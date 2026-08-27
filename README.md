@@ -121,8 +121,8 @@ Open http://localhost:5000 in the browser with MetaMask installed.
 2. **Register** — with the Shipper account click *Register as Shipper*; switch the
    MetaMask account to the Carrier and click *Register as Carrier*.
 3. **Create Agreement** — as the Shipper, enter the Carrier's address, milestone
-   count (e.g. 3) and a deadline, then *Create Agreement* (note the new ID).
-4. **Fund Escrow** — as the Shipper, fund the agreement with e.g. 3 ETH.
+   count (e.g. 3), total payload value (e.g. 3 ETH) and a deadline, then *Create Agreement* (note the new ID).
+4. **Fund Escrow** — as the Shipper, fund the agreement with the **exact amount** declared in step 3 (e.g. 3 ETH).
 5. **Verify Milestone** — as the Shipper, click *Verify Next Milestone*; each
    verification releases an even share (e.g. 1 ETH) to the Carrier and awards
    +1 reputation. After the last milestone the agreement becomes *Completed*.

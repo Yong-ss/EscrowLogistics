@@ -10,6 +10,7 @@ const loadAgreementDetails = async () => {
       "<b>ID:</b> " + agreementRecord.id + "<br>" +
       "<b>Shipper:</b> " + agreementRecord.shipper + "<br>" +
       "<b>Carrier:</b> " + agreementRecord.carrier + "<br>" +
+      "<b>Declared payload value:</b> " + web3Client.utils.fromWei(agreementRecord.declaredPayloadValue, "ether") + " ETH<br>" +
       "<b>Total value:</b> " + web3Client.utils.fromWei(agreementRecord.totalValue, "ether") + " ETH<br>" +
       "<b>Milestones:</b> " + agreementRecord.milestonesDone + " / " + agreementRecord.milestoneCount + "<br>" +
       "<b>Released:</b> " + web3Client.utils.fromWei(agreementRecord.amountReleased, "ether") + " ETH<br>" +

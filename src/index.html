@@ -31,6 +31,7 @@
       <h2>Create Agreement</h2>
       <label>Carrier address <input id="carrierAddr" type="text" placeholder="0x..." /></label>
       <label>Milestone count <input id="milestoneCount" type="number" min="1" value="3" /></label>
+      <label>Total payload value (Ether) <input id="payloadValue" type="text" value="3" /></label>
       <label>Deadline (minutes from now) <input id="deadlineMins" type="number" min="1" value="60" /></label>
       <button onclick="createNewAgreement()">Create Agreement</button>
     </section>
@@ -38,6 +39,7 @@
     <!-- Fund escrow -->
     <section>
       <h2>Fund Escrow</h2>
+      <p class="hint">Amount must match the total payload value declared when the agreement was created.</p>
       <label>Agreement ID <input id="fundId" type="number" min="1" value="1" /></label>
       <label>Amount (Ether) <input id="fundAmount" type="text" value="3" /></label>
       <button onclick="fundAgreementEscrow()">Fund</button>

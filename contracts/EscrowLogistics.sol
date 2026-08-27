@@ -15,12 +15,13 @@ contract EscrowLogistics {
         uint id;
         address shipper;
         address carrier;
-        uint totalValue;        // total Ether locked, in Wei
-        uint milestoneCount;    // total milestones agreed
-        uint milestonesDone;    // milestones verified so far
-        uint amountReleased;    // Wei already paid to the carrier
-        uint deadline;          // block.timestamp by which milestones must be done
+        uint totalValue;             // total Ether locked, in Wei (set once funded)
+        uint milestoneCount;         // total milestones agreed
+        uint milestonesDone;         // milestones verified so far
+        uint amountReleased;         // Wei already paid to the carrier
+        uint deadline;               // block.timestamp by which milestones must be done
         Status status;
+        uint declaredPayloadValue;   // total payload value declared at creation, in Wei
     }
 
     // ---------- State ----------
@@ -31,7 +32,7 @@ contract EscrowLogistics {
 
     // ---------- Events (frontend reads these for history) ----------
     event Registered(address indexed user, Role role);
-    event AgreementCreated(uint indexed id, address indexed shipper, address indexed carrier, uint milestoneCount, uint deadline);
+    event AgreementCreated(uint indexed id, address indexed shipper, address indexed carrier, uint milestoneCount, uint declaredPayloadValue, uint deadline);
     event Funded(uint indexed id, uint amount);
     event MilestoneVerified(uint indexed id, uint milestoneNo, uint payout, address carrier);
     event AgreementCompleted(uint indexed id);
@@ -52,10 +53,13 @@ contract EscrowLogistics {
     }
 
     // ---------- 2. Agreement creation ----------
-    function createAgreement(address _carrier, uint _milestoneCount, uint _deadline) public returns (uint) {
+    // _declaredPayloadValue is the total payload value the Shipper commits to
+    // funding, in Wei, declared up front at creation time.
+    function createAgreement(address _carrier, uint _milestoneCount, uint _declaredPayloadValue, uint _deadline) public returns (uint) {
         require(roles[msg.sender] == Role.Shipper, "Only a registered Shipper can create");
         require(roles[_carrier] == Role.Carrier, "Assigned address is not a Carrier");
         require(_milestoneCount > 0, "Need at least one milestone");
+        require(_declaredPayloadValue > 0, "Declared payload value must be greater than zero");
         require(_deadline > block.timestamp, "Deadline must be in the future");
 
         agreementCount++;
@@ -68,10 +72,11 @@ contract EscrowLogistics {
             0,                  // milestonesDone
             0,                  // amountReleased
             _deadline,
-            Status.Created
+            Status.Created,
+            _declaredPayloadValue
         );
 
-        emit AgreementCreated(agreementCount, msg.sender, _carrier, _milestoneCount, _deadline);
+        emit AgreementCreated(agreementCount, msg.sender, _carrier, _milestoneCount, _declaredPayloadValue, _deadline);
         return agreementCount;
     }
 
@@ -79,7 +84,7 @@ contract EscrowLogistics {
     function fund(uint _id) public payable onlyShipperOf(_id) {
         Agreement storage a = agreements[_id];
         require(a.status == Status.Created, "Agreement is not awaiting funding");
-        require(msg.value > 0, "Must send some Ether to fund");
+        require(msg.value == a.declaredPayloadValue, "Funded amount must match the declared payload value");
 
         a.totalValue = msg.value;
         a.status = Status.Funded;
@@ -121,6 +126,12 @@ contract EscrowLogistics {
     }
 
     // ---------- 5. Refund on missed deadline ----------
+    // Deliberately callable by anyone (no onlyShipperOf/onlyCarrier check): the
+    // EVM has no built-in scheduler, so a contract can never execute itself once
+    // a deadline passes. Any account can be the one to submit this transaction
+    // once block.timestamp > deadline, so the refund still fires without relying
+    // on the Shipper remembering to click a button - the closest a smart contract
+    // can get to "automatic" without an external keeper/automation service.
     function refund(uint _id) public {
         Agreement storage a = agreements[_id];
         require(a.status == Status.Funded, "Only a funded agreement can be refunded");

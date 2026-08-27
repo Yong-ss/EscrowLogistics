@@ -4,11 +4,13 @@ const createNewAgreement = async () => {
   try {
     const carrierAddressInput = document.getElementById("carrierAddr").value;
     const milestoneCountInput = document.getElementById("milestoneCount").value;
+    const payloadValueEther = document.getElementById("payloadValue").value;
+    const payloadValueWei = web3Client.utils.toWei(payloadValueEther, "ether");
     const deadlineMinutesInput = parseInt(document.getElementById("deadlineMins").value, 10);
     const deadlineTimestamp = Math.floor(Date.now() / 1000) + deadlineMinutesInput * 60;
 
     const result = await escrowContract.methods
-      .createAgreement(carrierAddressInput, milestoneCountInput, deadlineTimestamp)
+      .createAgreement(carrierAddressInput, milestoneCountInput, payloadValueWei, deadlineTimestamp)
       .send({ from: connectedAccount });
 
     const agreementId = result.events.AgreementCreated.returnValues.id;
