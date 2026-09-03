@@ -1,7 +1,9 @@
+// Creates one name and description form for each milestone count.
 const renderMilestoneInputs = () => {
   const container = document.getElementById("milestoneInputs");
   const count = Math.max(1, Number(document.getElementById("milestoneCount").value) || 1);
 
+  // Rebuild the list when the Shipper changes the number of milestones.
   container.innerHTML = "";
   for (let index = 0; index < count; index++) {
     container.innerHTML += `
@@ -21,11 +23,13 @@ const renderMilestoneInputs = () => {
   }
 };
 
+// Reads the milestone form values before sending them to the contract.
 const getMilestoneInputs = () => ({
   names: Array.from(document.querySelectorAll("[name='milestoneName']")).map((input) => input.value.trim()),
   descriptions: Array.from(document.querySelectorAll("[name='milestoneDescription']")).map((input) => input.value.trim()),
 });
 
+// Render the default milestone fields as soon as the create page is ready.
 document.addEventListener("DOMContentLoaded", () => {
   const countInput = document.getElementById("milestoneCount");
   if (!countInput) return;

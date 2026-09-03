@@ -4,6 +4,7 @@
 let connectedAccount;   // the address of the currently connected MetaMask account
 let web3Client;         // the web3.js instance built from window.ethereum
 
+// Asks MetaMask for the user's wallet and then connects it to the contract.
 const connectWallet = async () => {
   if (typeof window.ethereum === "undefined") {
     showStatusMessage("MetaMask is not installed.");

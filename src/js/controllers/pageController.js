@@ -1,5 +1,6 @@
 // Decides which section of the page to show, based on the connected account's role.
 
+// Reads the wallet role and shows only the pages that role can use.
 const refreshPageForRole = async () => {
   if (!escrowContract || !connectedAccount) return;
   const currentUserRole = Number(await escrowContract.methods.roles(connectedAccount).call());

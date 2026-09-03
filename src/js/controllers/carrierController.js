@@ -1,5 +1,6 @@
 // Carrier dashboard: reputation points + the list of jobs assigned to this account.
 
+// Loads the Carrier's reputation and then refreshes the assigned jobs.
 const loadCarrierDashboard = async () => {
   const reputationPoints = await escrowContract.methods.reputation(connectedAccount).call();
   document.getElementById("repPoints").innerHTML = reputationPoints;
@@ -7,6 +8,7 @@ const loadCarrierDashboard = async () => {
 };
 
 // list every agreement where the connected account is the carrier
+// Finds every agreement assigned to the connected Carrier wallet.
 const loadCarrierJobs = async () => {
   try {
     const totalAgreementCount = Number(await escrowContract.methods.agreementCount().call());

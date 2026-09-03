@@ -1,5 +1,7 @@
+// Opens or closes the sidebar on small screens.
 const toggleSidebar = () => document.body.classList.toggle("sidebar-open");
 
+// Loads the same sidebar, header, and footer into every page.
 const loadSharedPartials = async () => {
   const placeholders = document.querySelectorAll("[data-include]");
 
@@ -19,6 +21,7 @@ const loadSharedPartials = async () => {
   if (activeLink) activeLink.classList.add("active");
 };
 
+// Hides menu items that do not belong to the connected wallet's role.
 const applyRoleLayout = (roleNumber) => {
   const roleName = ROLE_NAMES[roleNumber] || "Guest";
   document.body.dataset.role = roleName.toLowerCase();

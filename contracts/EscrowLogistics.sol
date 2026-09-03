@@ -25,8 +25,8 @@ contract EscrowLogistics {
     }
 
     struct Milestone {
-        string name;
-        string description;
+        string name;             // short title, such as "Pickup from warehouse"
+        string description;      // plain instructions visible to both sides
     }
 
     // ---------- State ----------
@@ -45,12 +45,14 @@ contract EscrowLogistics {
     event Refunded(uint indexed id, uint amount, address shipper);
 
     // ---------- Modifiers ----------
+    // Reusable check: only the Shipper who owns this agreement may continue.
     modifier onlyShipperOf(uint _id) {
         require(msg.sender == agreements[_id].shipper, "Only the shipper of this agreement");
         _;
     }
 
     // ---------- 1. Registration ----------
+    // Saves one wallet's role so the contract can check permissions later.
     function register(Role _role) public {
         require(_role == Role.Shipper || _role == Role.Carrier, "Role must be Shipper or Carrier");
         require(roles[msg.sender] == Role.None, "Address already registered");
@@ -61,6 +63,7 @@ contract EscrowLogistics {
     // ---------- 2. Agreement creation ----------
     // _declaredPayloadValue is the total payload value the Shipper commits to
     // funding, in Wei, declared up front at creation time.
+    // Shipper creates an agreement and records the simple plan for every milestone.
     function createAgreement(
         address _carrier,
         uint _milestoneCount,
@@ -91,6 +94,7 @@ contract EscrowLogistics {
             _declaredPayloadValue
         );
 
+        // Store the plan in the same order the Shipper entered it.
         for (uint i = 0; i < _milestoneCount; i++) {
             require(bytes(_milestoneNames[i]).length > 0, "Milestone name is required");
             agreementMilestones[agreementCount].push(
@@ -103,6 +107,7 @@ contract EscrowLogistics {
     }
 
     // ---------- 3. Funding (lock Ether into escrow) ----------
+    // Shipper locks the exact declared amount into this agreement.
     function fund(uint _id) public payable onlyShipperOf(_id) {
         Agreement storage a = agreements[_id];
         require(a.status == Status.Created, "Agreement is not awaiting funding");
@@ -115,6 +120,7 @@ contract EscrowLogistics {
     }
 
     // ---------- 4. Milestone verification + progressive payout ----------
+    // Shipper approves the next step and sends its payment to the Carrier.
     function verifyMilestone(uint _id) public onlyShipperOf(_id) {
         Agreement storage a = agreements[_id];
         require(a.status == Status.Funded, "Agreement is not in progress");
@@ -154,6 +160,7 @@ contract EscrowLogistics {
     // once block.timestamp > deadline, so the refund still fires without relying
     // on the Shipper remembering to click a button - the closest a smart contract
     // can get to "automatic" without an external keeper/automation service.
+    // Anyone can start the refund after the deadline; money goes back to the Shipper.
     function refund(uint _id) public {
         Agreement storage a = agreements[_id];
         require(a.status == Status.Funded, "Only a funded agreement can be refunded");
@@ -169,10 +176,12 @@ contract EscrowLogistics {
     }
 
     // ---------- 6/7. Views ----------
+    // Returns all stored information for one agreement without changing the blockchain.
     function getAgreement(uint _id) public view returns (Agreement memory) {
         return agreements[_id];
     }
 
+    // Anyone can read one milestone so both sides know what that step means.
     function getMilestone(uint _agreementId, uint _milestoneNo)
         public
         view
@@ -183,6 +192,7 @@ contract EscrowLogistics {
         return (milestone.name, milestone.description);
     }
 
+    // Calculates how much Ether is still locked in the agreement.
     function escrowBalance(uint _id) public view returns (uint) {
         Agreement memory a = agreements[_id];
         return a.totalValue - a.amountReleased;

@@ -1,5 +1,6 @@
 // Shipper actions: create an agreement, fund it, verify milestones, refund.
 
+// Collects the form and creates a new agreement on the blockchain.
 const createNewAgreement = async () => {
   try {
     const carrierAddressInput = document.getElementById("carrierAddr").value;
@@ -29,6 +30,7 @@ const createNewAgreement = async () => {
 };
 
 // fund an agreement (lock Ether into escrow)
+// Sends the declared Ether amount into the agreement's escrow.
 const fundAgreementEscrow = async () => {
   try {
     const agreementId = document.getElementById("fundId").value;
@@ -43,6 +45,7 @@ const fundAgreementEscrow = async () => {
 };
 
 // verify the next milestone (releases a payout share to the carrier)
+// Approves the next milestone and reports the payment released to the Carrier.
 const verifyNextMilestone = async () => {
   try {
     const agreementId = document.getElementById("verifyId").value;
@@ -56,6 +59,7 @@ const verifyNextMilestone = async () => {
 };
 
 // trigger a refund after the deadline
+// Requests the remaining escrow to be returned after the deadline.
 const requestRefund = async () => {
   try {
     const agreementId = document.getElementById("refundId").value;

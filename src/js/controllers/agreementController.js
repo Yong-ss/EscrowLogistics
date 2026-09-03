@@ -1,5 +1,6 @@
 // Shared views (both roles): agreement details lookup + event history table.
 
+// Loads one agreement and shows its progress and milestone plan.
 const loadAgreementDetails = async () => {
   try {
     const agreementId = document.getElementById("viewId").value;
@@ -7,6 +8,7 @@ const loadAgreementDetails = async () => {
     const escrowBalanceWei = await escrowContract.methods.escrowBalance(agreementId).call();
     const milestoneRows = [];
 
+    // Read each step so the page can show a simple progress timeline.
     for (let index = 0; index < Number(agreementRecord.milestoneCount); index++) {
       const milestone = await escrowContract.methods.getMilestone(agreementId, index).call();
       const complete = index < Number(agreementRecord.milestonesDone);
@@ -36,6 +38,7 @@ const loadAgreementDetails = async () => {
 };
 
 // build a transaction history from past events
+// Loads blockchain events so the user can review the agreement history.
 const loadAgreementHistory = async () => {
   try {
     const historyRows = [];
