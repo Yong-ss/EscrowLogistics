@@ -1,12 +1,17 @@
 // Decides which section of the page to show, based on the connected account's role.
 
 const refreshPageForRole = async () => {
+  if (!escrowContract || !connectedAccount) return;
   const currentUserRole = Number(await escrowContract.methods.roles(connectedAccount).call());
 
   // role badge in the header
   const roleBadge = document.getElementById("roleBadge");
-  roleBadge.innerHTML = ROLE_NAMES[currentUserRole];
-  roleBadge.classList.remove("hidden");
+  if (roleBadge) {
+    roleBadge.innerHTML = ROLE_NAMES[currentUserRole];
+    roleBadge.classList.remove("hidden");
+  }
+
+  if (typeof applyRoleLayout === "function") applyRoleLayout(currentUserRole);
 
   // start from a clean slate, then reveal what fits the role
   hidePanel("registerSection");
@@ -25,7 +30,7 @@ const refreshPageForRole = async () => {
     showPanel("carrierView");
     showPanel("detailsSection");
     showPanel("historySection");
-    await loadCarrierDashboard();
+    if (typeof loadCarrierDashboard === "function") await loadCarrierDashboard();
   } else {
     // not registered yet
     showPanel("registerSection");

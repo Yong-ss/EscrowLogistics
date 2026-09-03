@@ -1,129 +1,154 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Escrow Logistics dApp</title>
-  <link rel="stylesheet" href="css/style.css" />
-</head>
-<body>
-  <header>
-    <h1>Decentralized Escrow &amp; Milestone Logistics</h1>
-    <div id="wallet">
-      <button onclick="connectWallet()">Connect MetaMask</button>
-      <span id="account">Not connected</span>
-      <span id="roleBadge" class="badge hidden">Unknown</span>
-    </div>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Dashboard · Escrow Logistics</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
 
-  <!-- Registration: shown until the connected account has a role -->
-  <section id="registerSection">
-    <h2>Register</h2>
-    <p>You are not registered yet. Choose your role to start.</p>
-    <button onclick="registerAsRole(1)">Register as Shipper</button>
-    <button onclick="registerAsRole(2)">Register as Carrier</button>
-  </section>
-
-  <!-- ============ SHIPPER VIEW ============ -->
-  <div id="shipperView" class="hidden">
-    <!-- Create agreement -->
-    <section>
-      <h2>Create Agreement</h2>
-      <label>Carrier address <input id="carrierAddr" type="text" placeholder="0x..." /></label>
-      <label>Milestone count <input id="milestoneCount" type="number" min="1" value="3" /></label>
-      <label>Total payload value (Ether) <input id="payloadValue" type="text" value="3" /></label>
-      <label>Deadline (minutes from now) <input id="deadlineMins" type="number" min="1" value="60" /></label>
-      <button onclick="createNewAgreement()">Create Agreement</button>
-    </section>
-
-    <!-- Fund escrow -->
-    <section>
-      <h2>Fund Escrow</h2>
-      <p class="hint">Amount must match the total payload value declared when the agreement was created.</p>
-      <label>Agreement ID <input id="fundId" type="number" min="1" value="1" /></label>
-      <label>Amount (Ether) <input id="fundAmount" type="text" value="3" /></label>
-      <button onclick="fundAgreementEscrow()">Fund</button>
-    </section>
-
-    <!-- Verify milestone -->
-    <section>
-      <h2>Verify Milestone &amp; Release Payment</h2>
-      <label>Agreement ID <input id="verifyId" type="number" min="1" value="1" /></label>
-      <button onclick="verifyNextMilestone()">Verify Next Milestone</button>
-    </section>
-
-    <!-- Refund -->
-    <section>
-      <h2>Refund (after deadline)</h2>
-      <label>Agreement ID <input id="refundId" type="number" min="1" value="1" /></label>
-      <button onclick="requestRefund()">Trigger Refund</button>
-    </section>
-  </div>
-
-  <!-- ============ CARRIER VIEW ============ -->
-  <div id="carrierView" class="hidden">
-    <section>
-      <h2>Carrier Dashboard</h2>
-      <p>Reputation points: <strong id="repPoints">0</strong></p>
-      <p class="hint">As a Carrier you receive payments automatically when the Shipper verifies each
-        milestone. There are no buttons to press — just track your jobs and earnings below.</p>
-      <button onclick="loadCarrierJobs()">Refresh My Jobs</button>
-    </section>
-
-    <section>
-      <h2>My Jobs (agreements where I am the Carrier)</h2>
-      <table id="jobsTable">
-        <thead>
-          <tr>
-            <th>ID</th><th>Shipper</th><th>Total (ETH)</th>
-            <th>Milestones</th><th>Received (ETH)</th><th>Status</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-  </div>
-
-  <!-- ============ SHARED VIEW (both roles) ============ -->
-  <!-- Agreement details -->
-  <section id="detailsSection" class="hidden">
-    <h2>Agreement Details</h2>
-    <label>Agreement ID <input id="viewId" type="number" min="1" value="1" /></label>
-    <button onclick="loadAgreementDetails()">Load</button>
-    <div id="agreementDetails"></div>
-  </section>
-
-  <!-- Transaction history -->
-  <section id="historySection" class="hidden">
-    <h2>Transaction History</h2>
-    <button onclick="loadAgreementHistory()">Refresh History</button>
-    <table id="historyTable">
-      <thead>
-        <tr><th>Event</th><th>Details</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </section>
-
-  <div id="status"></div>
-
-  <!-- web3.js loaded from CDN (Lab 8.1) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
-  <script src="js/abi.js"></script>
-
-  <!-- utils: no contract logic, just shared helpers -->
-  <script src="js/utils/formatUtils.js"></script>
-  <script src="js/utils/domUtils.js"></script>
-
-  <!-- services: connect wallet + build the contract instance -->
-  <script src="js/services/walletConnection.js"></script>
-  <script src="js/services/contractConnection.js"></script>
-
-  <!-- controllers: one file per section of the page -->
-  <script src="js/controllers/pageController.js"></script>
-  <script src="js/controllers/registerController.js"></script>
-  <script src="js/controllers/shipperController.js"></script>
-  <script src="js/controllers/carrierController.js"></script>
-  <script src="js/controllers/agreementController.js"></script>
-</body>
+  <body data-page="dashboard">
+    <aside class="sidebar">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">EL</span>
+        <span>
+          Escrow
+          <span class="muted">Logistics</span>
+        </span>
+      </a>
+      <p class="nav-label">WORKSPACE</p>
+      <nav>
+        <a href="index.html" data-page-link="dashboard">
+          ⌂
+          <span>Dashboard</span>
+        </a>
+        <a href="agreements.html" data-page-link="agreements">
+          ▤
+          <span>Agreements</span>
+        </a>
+        <a href="carrier-jobs.html" data-role="carrier" data-page-link="jobs">
+          ◈
+          <span>My jobs</span>
+        </a>
+      </nav>
+      <p class="nav-label" data-role="shipper">SHIPPER TOOLS</p>
+      <nav data-role="shipper">
+        <a href="create-agreement.html" data-page-link="create">
+          ＋
+          <span>Create agreement</span>
+        </a>
+        <a href="fund.html" data-page-link="fund">
+          ↗
+          <span>Fund escrow</span>
+        </a>
+        <a href="verify.html" data-page-link="verify">
+          ✓
+          <span>Verify milestone</span>
+        </a>
+        <a href="refund.html" data-page-link="refund">
+          ↩
+          <span>Refund</span>
+        </a>
+      </nav>
+      <div class="sidebar-bottom">
+        <a href="register.html" data-page-link="register">
+          ◎
+          <span>Account &amp; role</span>
+        </a>
+      </div>
+    </aside>
+    <main class="app-shell">
+      <header class="topbar">
+        <button class="menu-button" onclick="toggleSidebar()">☰</button>
+        <div>
+          <p class="eyebrow">WORKSPACE</p>
+          <h1>Dashboard</h1>
+        </div>
+        <div class="wallet-area">
+          <span class="badge hidden" id="roleBadge">Unknown</span>
+          <button class="button button-dark" onclick="connectWallet()">
+            Connect wallet
+          </button>
+        </div>
+      </header>
+      <section class="hero-card">
+        <div>
+          <p class="eyebrow light">DECENTRALIZED ESCROW</p>
+          <h2>
+            Move every delivery forward
+            <br />
+            with confidence.
+          </h2>
+          <p class="hero-copy">
+            Create milestone-based agreements, lock funds securely, and release
+            payments as work is verified.
+          </p>
+          <a
+            class="button button-light"
+            href="create-agreement.html"
+            data-role="shipper"
+          >
+            Create an agreement
+            <span>→</span>
+          </a>
+          <a
+            class="button button-light"
+            href="carrier-jobs.html"
+            data-role="carrier"
+          >
+            View my jobs
+            <span>→</span>
+          </a>
+        </div>
+        <div class="hero-orbit">
+          <div class="orbit-center">EL</div>
+          <span class="orbit-dot dot-one"></span>
+          <span class="orbit-dot dot-two"></span>
+        </div>
+      </section>
+      <section class="section-heading">
+        <div>
+          <p class="eyebrow">QUICK ACCESS</p>
+          <h2>What would you like to do?</h2>
+        </div>
+      </section>
+      <section class="action-grid">
+        <a class="action-card" href="create-agreement.html" data-role="shipper">
+          <span class="icon-chip green">＋</span>
+          <h3>Create agreement</h3>
+          <p>Set a carrier, milestone plan, value, and deadline.</p>
+          <span class="card-arrow">→</span>
+        </a>
+        <a class="action-card" href="fund.html" data-role="shipper">
+          <span class="icon-chip blue">↗</span>
+          <h3>Fund escrow</h3>
+          <p>Lock the declared payload value into the agreement.</p>
+          <span class="card-arrow">→</span>
+        </a>
+        <a class="action-card" href="agreements.html">
+          <span class="icon-chip orange">▤</span>
+          <h3>View agreements</h3>
+          <p>Review status, payouts, and carrier assignments.</p>
+          <span class="card-arrow">→</span>
+        </a>
+      </section>
+      <section class="connect-strip">
+        <div>
+          <span class="status-dot"></span>
+          <strong id="account">Wallet not connected</strong>
+          <p>Connect MetaMask to view your on-chain workspace.</p>
+        </div>
+        <a href="register.html" class="text-link">Set up your role →</a>
+      </section>
+      <div id="status" class="status-message"></div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <script src="js/abi.js"></script>
+    <script src="js/utils/formatUtils.js"></script>
+    <script src="js/utils/domUtils.js"></script>
+    <script src="js/services/walletConnection.js"></script>
+    <script src="js/services/contractConnection.js"></script>
+    <script src="js/controllers/pageController.js"></script>
+    <script src="js/siteShell.js"></script>
+  </body>
 </html>

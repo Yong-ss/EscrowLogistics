@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>My Jobs · Escrow Logistics</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body data-page="jobs">
+    <aside class="sidebar">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">EL</span>
+        <span>
+          Escrow
+          <span class="muted">Logistics</span>
+        </span>
+      </a>
+      <p class="nav-label">WORKSPACE</p>
+      <nav>
+        <a href="index.html" data-page-link="dashboard">
+          ⌂
+          <span>Dashboard</span>
+        </a>
+        <a href="agreements.html" data-page-link="agreements">
+          ▤
+          <span>Agreements</span>
+        </a>
+        <a href="carrier-jobs.html" data-role="carrier" data-page-link="jobs">
+          ◈
+          <span>My jobs</span>
+        </a>
+      </nav>
+      <p class="nav-label" data-role="shipper">SHIPPER TOOLS</p>
+      <nav data-role="shipper">
+        <a href="create-agreement.html" data-page-link="create">
+          ＋
+          <span>Create agreement</span>
+        </a>
+        <a href="fund.html" data-page-link="fund">
+          ↗
+          <span>Fund escrow</span>
+        </a>
+        <a href="verify.html" data-page-link="verify">
+          ✓
+          <span>Verify milestone</span>
+        </a>
+        <a href="refund.html" data-page-link="refund">
+          ↩
+          <span>Refund</span>
+        </a>
+      </nav>
+      <div class="sidebar-bottom">
+        <a href="register.html" data-page-link="register">
+          ◎
+          <span>Account &amp; role</span>
+        </a>
+      </div>
+    </aside>
+    <main class="app-shell">
+      <header class="topbar">
+        <button class="menu-button" onclick="toggleSidebar()">☰</button>
+        <div>
+          <p class="eyebrow">ESCROW LOGISTICS</p>
+          <h1>My jobs</h1>
+        </div>
+        <div class="wallet-area">
+          <span class="badge hidden" id="roleBadge">Unknown</span>
+          <button class="button button-dark" onclick="connectWallet()">
+            Connect wallet
+          </button>
+        </div>
+      </header>
+      <div class="page-content">
+        <p class="form-help">
+          Track agreements assigned to your wallet, released earnings, and
+          reputation.
+        </p>
+        <section class="table-card" data-role="carrier">
+          <h2>Carrier dashboard</h2>
+          <p>
+            Reputation points:
+            <strong id="repPoints">0</strong>
+          </p>
+          <button class="button button-dark" onclick="loadCarrierJobs()">
+            Refresh jobs
+          </button>
+          <table class="data-table" id="jobsTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Shipper</th>
+                <th>Total ETH</th>
+                <th>Milestones</th>
+                <th>Received ETH</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+        <div id="status" class="status-message"></div>
+      </div>
+    </main>
+    <script src="js/controllers/carrierController.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <script src="js/abi.js"></script>
+    <script src="js/utils/formatUtils.js"></script>
+    <script src="js/utils/domUtils.js"></script>
+    <script src="js/services/walletConnection.js"></script>
+    <script src="js/services/contractConnection.js"></script>
+    <script src="js/controllers/pageController.js"></script>
+    <script src="js/siteShell.js"></script>
+  </body>
+</html>

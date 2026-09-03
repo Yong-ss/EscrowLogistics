@@ -17,3 +17,8 @@ const connectWallet = async () => {
   await refreshPageForRole();
   showStatusMessage("Connected to MetaMask.");
 };
+
+if (typeof window.ethereum !== "undefined") {
+  window.ethereum.on("accountsChanged", () => window.location.reload());
+  window.ethereum.on("chainChanged", () => window.location.reload());
+}

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Account & Role · Escrow Logistics</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body data-page="register">
+    <aside class="sidebar">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">EL</span>
+        <span>
+          Escrow
+          <span class="muted">Logistics</span>
+        </span>
+      </a>
+      <p class="nav-label">WORKSPACE</p>
+      <nav>
+        <a href="index.html" data-page-link="dashboard">
+          ⌂
+          <span>Dashboard</span>
+        </a>
+        <a href="agreements.html" data-page-link="agreements">
+          ▤
+          <span>Agreements</span>
+        </a>
+        <a href="carrier-jobs.html" data-role="carrier" data-page-link="jobs">
+          ◈
+          <span>My jobs</span>
+        </a>
+      </nav>
+      <p class="nav-label" data-role="shipper">SHIPPER TOOLS</p>
+      <nav data-role="shipper">
+        <a href="create-agreement.html" data-page-link="create">
+          ＋
+          <span>Create agreement</span>
+        </a>
+        <a href="fund.html" data-page-link="fund">
+          ↗
+          <span>Fund escrow</span>
+        </a>
+        <a href="verify.html" data-page-link="verify">
+          ✓
+          <span>Verify milestone</span>
+        </a>
+        <a href="refund.html" data-page-link="refund">
+          ↩
+          <span>Refund</span>
+        </a>
+      </nav>
+      <div class="sidebar-bottom">
+        <a href="register.html" data-page-link="register">
+          ◎
+          <span>Account &amp; role</span>
+        </a>
+      </div>
+    </aside>
+    <main class="app-shell">
+      <header class="topbar">
+        <button class="menu-button" onclick="toggleSidebar()">☰</button>
+        <div>
+          <p class="eyebrow">ESCROW LOGISTICS</p>
+          <h1>Account & role</h1>
+        </div>
+        <div class="wallet-area">
+          <span class="badge hidden" id="roleBadge">Unknown</span>
+          <button class="button button-dark" onclick="connectWallet()">
+            Connect wallet
+          </button>
+        </div>
+      </header>
+      <div class="page-content">
+        <p class="form-help">
+          Connect your wallet, then choose the role that matches your side of
+          the delivery.
+        </p>
+        <section class="form-card">
+          <h2 id="account">Wallet not connected</h2>
+          <p class="form-help">
+            One wallet can register once. Your role is stored on-chain.
+          </p>
+          <div class="action-grid">
+            <button class="button button-dark" onclick="registerAsRole(1)">
+              Register as Shipper
+            </button>
+            <button class="button button-dark" onclick="registerAsRole(2)">
+              Register as Carrier
+            </button>
+          </div>
+        </section>
+        <div id="status" class="status-message"></div>
+      </div>
+    </main>
+    <script src="js/controllers/registerController.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <script src="js/abi.js"></script>
+    <script src="js/utils/formatUtils.js"></script>
+    <script src="js/utils/domUtils.js"></script>
+    <script src="js/services/walletConnection.js"></script>
+    <script src="js/services/contractConnection.js"></script>
+    <script src="js/controllers/pageController.js"></script>
+    <script src="js/siteShell.js"></script>
+  </body>
+</html>
