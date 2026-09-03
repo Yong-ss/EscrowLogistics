@@ -53,16 +53,24 @@ struct Agreement {
     uint amountReleased;  // 已放款金额
     uint deadline;        // 截止时间(时间戳)
     Status status;
+    uint declaredPayloadValue; // 创建时声明的托管金额(Wei)
+}
+
+struct Milestone {
+    string name;           // 这一步要做什么
+    string description;    // 给双方看的简单说明
 }
 ```
 
 存储方式：`mapping(uint => Agreement) public agreements;` —— 用 id 查合约中的每一份协议，类似字典。
+每份协议的步骤存放在 `mapping(uint => Milestone[]) agreementMilestones` 中。
 
 ## 5. 状态变量（合约的"全局变量"）
 
 ```solidity
 mapping(address => Role) public roles;        // 谁注册了什么角色
 mapping(uint => Agreement) public agreements;  // 所有协议
+mapping(uint => Milestone[]) agreementMilestones; // 每份协议的步骤说明
 uint public agreementCount;                    // 协议计数器
 mapping(address => uint) public reputation;    // 承运人信誉分
 ```
@@ -109,14 +117,25 @@ function register(Role _role) public {
 
 ### (2) createAgreement — 创建协议
 ```solidity
-function createAgreement(address _carrier, uint _milestoneCount, uint _deadline) public returns (uint) {
+function createAgreement(
+    address _carrier,
+    uint _milestoneCount,
+    uint _declaredPayloadValue,
+    uint _deadline,
+    string[] calldata _milestoneNames,
+    string[] calldata _milestoneDescriptions
+) public returns (uint) {
     require(roles[msg.sender] == Role.Shipper, "...");   // 调用者必须是Shipper
     require(roles[_carrier] == Role.Carrier, "...");     // 对方必须是Carrier
     require(_milestoneCount > 0, "...");
+    require(_milestoneNames.length == _milestoneCount, "...");
+    require(_milestoneDescriptions.length == _milestoneCount, "...");
+    require(_declaredPayloadValue > 0, "...");
     require(_deadline > block.timestamp, "...");         // block.timestamp = 当前区块时间
 
     agreementCount++;
     agreements[agreementCount] = Agreement(...);          // 存入mapping
+    // 同时存入每个 milestone 的 name 和 description
     emit AgreementCreated(...);
     return agreementCount;
 }

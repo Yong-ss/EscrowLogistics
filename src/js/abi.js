@@ -1,9 +1,4 @@
-// Deployed contract address + ABI (Lab 8.1 "Method 1 - manual copy-paste").
-//
-// AFTER deploying EscrowLogistics.sol to Ganache (via Remix or "truffle migrate"),
-// paste the deployed contract address between the quotes below.
-// The ABI is already filled in from the compiled contract - no need to change it.
-
+// Contract address from the latest local deployment.
 const CONTRACT_ADDRESS = "0xD7d8De83BAF87339e020233C3603B079A62879B5";
 
 const CONTRACT_ABI = [
@@ -238,6 +233,57 @@ const CONTRACT_ABI = [
     "inputs": [
       {
         "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "reputation",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "roles",
+    "outputs": [
+      {
+        "internalType": "enum EscrowLogistics.Role",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum EscrowLogistics.Role",
+        "name": "_role",
+        "type": "uint8"
+      }
+    ],
+    "name": "register",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_carrier",
         "type": "address"
       },
@@ -255,6 +301,16 @@ const CONTRACT_ABI = [
         "internalType": "uint256",
         "name": "_deadline",
         "type": "uint256"
+      },
+      {
+        "internalType": "string[]",
+        "name": "_milestoneNames",
+        "type": "string[]"
+      },
+      {
+        "internalType": "string[]",
+        "name": "_milestoneDescriptions",
+        "type": "string[]"
       }
     ],
     "name": "createAgreement",
@@ -276,15 +332,9 @@ const CONTRACT_ABI = [
         "type": "uint256"
       }
     ],
-    "name": "escrowBalance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "fund",
+    "outputs": [],
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -295,9 +345,22 @@ const CONTRACT_ABI = [
         "type": "uint256"
       }
     ],
-    "name": "fund",
+    "name": "verifyMilestone",
     "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "refund",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -375,61 +438,26 @@ const CONTRACT_ABI = [
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_id",
+        "name": "_agreementId",
         "type": "uint256"
-      }
-    ],
-    "name": "refund",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "enum EscrowLogistics.Role",
-        "name": "_role",
-        "type": "uint8"
-      }
-    ],
-    "name": "register",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "reputation",
-    "outputs": [
+      },
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "_milestoneNo",
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "roles",
+    "name": "getMilestone",
     "outputs": [
       {
-        "internalType": "enum EscrowLogistics.Role",
-        "name": "",
-        "type": "uint8"
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -443,9 +471,15 @@ const CONTRACT_ABI = [
         "type": "uint256"
       }
     ],
-    "name": "verifyMilestone",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "escrowBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ];

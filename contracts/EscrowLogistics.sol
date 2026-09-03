@@ -24,9 +24,15 @@ contract EscrowLogistics {
         uint declaredPayloadValue;   // total payload value declared at creation, in Wei
     }
 
+    struct Milestone {
+        string name;
+        string description;
+    }
+
     // ---------- State ----------
     mapping(address => Role) public roles;          // who is a Shipper / Carrier
     mapping(uint => Agreement) public agreements;   // all agreements by id
+    mapping(uint => Milestone[]) private agreementMilestones;
     uint public agreementCount;                     // running counter of agreements
     mapping(address => uint) public reputation;     // carrier reputation points
 
@@ -55,10 +61,19 @@ contract EscrowLogistics {
     // ---------- 2. Agreement creation ----------
     // _declaredPayloadValue is the total payload value the Shipper commits to
     // funding, in Wei, declared up front at creation time.
-    function createAgreement(address _carrier, uint _milestoneCount, uint _declaredPayloadValue, uint _deadline) public returns (uint) {
+    function createAgreement(
+        address _carrier,
+        uint _milestoneCount,
+        uint _declaredPayloadValue,
+        uint _deadline,
+        string[] calldata _milestoneNames,
+        string[] calldata _milestoneDescriptions
+    ) public returns (uint) {
         require(roles[msg.sender] == Role.Shipper, "Only a registered Shipper can create");
         require(roles[_carrier] == Role.Carrier, "Assigned address is not a Carrier");
         require(_milestoneCount > 0, "Need at least one milestone");
+        require(_milestoneNames.length == _milestoneCount, "Milestone names do not match count");
+        require(_milestoneDescriptions.length == _milestoneCount, "Milestone descriptions do not match count");
         require(_declaredPayloadValue > 0, "Declared payload value must be greater than zero");
         require(_deadline > block.timestamp, "Deadline must be in the future");
 
@@ -75,6 +90,13 @@ contract EscrowLogistics {
             Status.Created,
             _declaredPayloadValue
         );
+
+        for (uint i = 0; i < _milestoneCount; i++) {
+            require(bytes(_milestoneNames[i]).length > 0, "Milestone name is required");
+            agreementMilestones[agreementCount].push(
+                Milestone(_milestoneNames[i], _milestoneDescriptions[i])
+            );
+        }
 
         emit AgreementCreated(agreementCount, msg.sender, _carrier, _milestoneCount, _declaredPayloadValue, _deadline);
         return agreementCount;
@@ -149,6 +171,16 @@ contract EscrowLogistics {
     // ---------- 6/7. Views ----------
     function getAgreement(uint _id) public view returns (Agreement memory) {
         return agreements[_id];
+    }
+
+    function getMilestone(uint _agreementId, uint _milestoneNo)
+        public
+        view
+        returns (string memory name, string memory description)
+    {
+        require(_milestoneNo < agreementMilestones[_agreementId].length, "Milestone does not exist");
+        Milestone memory milestone = agreementMilestones[_agreementId][_milestoneNo];
+        return (milestone.name, milestone.description);
     }
 
     function escrowBalance(uint _id) public view returns (uint) {

@@ -431,6 +431,86 @@ body {
     margin-top: 22px
 }
 
+.milestone-heading {
+    border-top: 1px solid var(--line);
+    margin-top: 28px;
+    padding-top: 24px
+}
+
+.milestone-heading h2 {
+    font-size: 18px;
+    margin: 0 0 4px
+}
+
+.milestone-heading .form-help {
+    margin-bottom: 16px
+}
+
+.milestone-input {
+    background: #fbfdfc;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    padding: 17px
+}
+
+.milestone-input h3 {
+    font-size: 14px;
+    margin: 0 0 13px
+}
+
+.milestone-list {
+    border-top: 1px solid var(--line);
+    margin-top: 24px;
+    padding-top: 20px
+}
+
+.milestone-list h3 {
+    font-size: 16px;
+    margin: 0 0 12px
+}
+
+.milestone-row {
+    align-items: center;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    gap: 12px;
+    padding: 13px 0
+}
+
+.milestone-number {
+    align-items: center;
+    background: #eef2ef;
+    border-radius: 50%;
+    color: var(--muted);
+    display: flex;
+    flex: 0 0 28px;
+    font-size: 12px;
+    height: 28px;
+    justify-content: center
+}
+
+.milestone-row.complete .milestone-number {
+    background: var(--mint);
+    color: var(--green)
+}
+
+.milestone-row strong {
+    font-size: 13px
+}
+
+.milestone-row p {
+    color: var(--muted);
+    font-size: 12px;
+    margin: 2px 0 0
+}
+
+.milestone-status {
+    color: var(--muted);
+    font-size: 11px;
+    margin-left: auto
+}
+
 .data-table {
     border-collapse: collapse;
     margin-top: 18px;

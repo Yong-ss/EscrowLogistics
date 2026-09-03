@@ -8,9 +8,17 @@ const createNewAgreement = async () => {
     const payloadValueWei = web3Client.utils.toWei(payloadValueEther, "ether");
     const deadlineMinutesInput = parseInt(document.getElementById("deadlineMins").value, 10);
     const deadlineTimestamp = Math.floor(Date.now() / 1000) + deadlineMinutesInput * 60;
+    const milestoneInputs = getMilestoneInputs();
 
     const result = await escrowContract.methods
-      .createAgreement(carrierAddressInput, milestoneCountInput, payloadValueWei, deadlineTimestamp)
+      .createAgreement(
+        carrierAddressInput,
+        milestoneCountInput,
+        payloadValueWei,
+        deadlineTimestamp,
+        milestoneInputs.names,
+        milestoneInputs.descriptions
+      )
       .send({ from: connectedAccount });
 
     const agreementId = result.events.AgreementCreated.returnValues.id;
