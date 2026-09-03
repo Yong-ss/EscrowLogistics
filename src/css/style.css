@@ -363,6 +363,15 @@ body {
     margin: 0 0 20px
 }
 
+.site-footer {
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    display: flex;
+    font-size: 12px;
+    justify-content: space-between;
+    padding: 22px 0 28px
+}
+
 .menu-button {
     background: none;
     border: 0;
