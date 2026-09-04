@@ -23,10 +23,8 @@
                     Completed agreements cannot be refunded. Already released Carrier
                     payments remain released.
                 </p>
-                <div class="field">
-                    <label for="refundId">Agreement ID</label>
-                    <input id="refundId" type="number" min="1" value="1" />
-                </div>
+                <input id="refundId" type="hidden" />
+                <div id="refundAgreementChoices" class="agreement-choices"></div>
                 <div class="form-actions">
                     <button class="button button-dark" onclick="requestRefund()">
                         Trigger refund →

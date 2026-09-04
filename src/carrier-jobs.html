@@ -29,15 +29,50 @@
             <thead>
               <tr>
                 <th>ID</th>
+                <th>Name</th>
                 <th>Shipper</th>
                 <th>Total ETH</th>
                 <th>Milestones</th>
                 <th>Received ETH</th>
-                <th>Status</th>
+                <th>Acceptance</th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
+        </section>
+        <section class="form-card carrier-form-card" data-role="carrier">
+          <h2>Accept an agreement</h2>
+          <p class="form-help">Accept the assignment before the Shipper funds it.</p>
+          <div class="field">
+            <label for="acceptAgreementId">Agreement ID</label>
+            <input id="acceptAgreementId" type="hidden" />
+            <div id="acceptAgreementChoices" class="agreement-choices"></div>
+          </div>
+          <button class="button button-dark" onclick="acceptCarrierAgreement()">
+            Accept agreement
+          </button>
+        </section>
+        <section class="form-card carrier-form-card" data-role="carrier">
+          <h2>Submit milestone</h2>
+          <p class="form-help">
+            Tell the Shipper what you completed before they release the next payment.
+          </p>
+          <div class="field">
+            <label for="submitAgreementId">Agreement ID</label>
+            <input id="submitAgreementId" type="hidden" />
+            <div id="submitAgreementChoices" class="agreement-choices"></div>
+          </div>
+          <button class="button button-light" onclick="loadCurrentMilestone()">
+            Show current milestone
+          </button>
+          <div id="currentMilestone" class="form-help"></div>
+          <div class="field">
+            <label for="completionNote">Completion note</label>
+            <textarea id="completionNote" rows="4" required placeholder="What did you complete?"></textarea>
+          </div>
+          <button class="button button-dark" onclick="submitCurrentMilestone()">
+            Submit milestone
+          </button>
         </section>
         <div id="status" class="status-message"></div>
       </div>

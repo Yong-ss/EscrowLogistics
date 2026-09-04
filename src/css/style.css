@@ -363,6 +363,21 @@ body {
     margin: 0 0 20px
 }
 
+.status-message.error {
+    background: #fff1ef;
+    border: 1px solid #f1d0ca;
+    border-radius: 9px;
+    color: #a3473c;
+    padding: 12px 14px
+}
+
+.status-message.success {
+    background: #f0f9f4;
+    border: 1px solid #d5ecdf;
+    border-radius: 9px;
+    padding: 12px 14px
+}
+
 .site-footer {
     border-top: 1px solid var(--line);
     color: var(--muted);
@@ -423,7 +438,9 @@ body {
     font-weight: 750
 }
 
-.field input {
+.field input,
+.field select,
+.field textarea {
     background: #fbfdfc;
     border: 1px solid #dce5df;
     border-radius: 8px;
@@ -431,9 +448,141 @@ body {
     padding: 12px
 }
 
-.field input:focus {
+.field textarea {
+    line-height: 1.55;
+    min-height: 112px;
+    resize: vertical
+}
+
+.field select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--green) 50%), linear-gradient(135deg, var(--green) 50%, transparent 50%);
+    background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+    background-repeat: no-repeat;
+    background-size: 6px 6px, 6px 6px;
+    cursor: pointer;
+    min-height: 46px;
+    padding-right: 38px
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
     border-color: var(--green);
     outline: 3px solid #dff1e8
+}
+
+.carrier-form-card {
+    margin-top: 18px;
+    max-width: 760px
+}
+
+.carrier-form-card .form-help {
+    line-height: 1.55;
+    margin-bottom: 18px
+}
+
+.carrier-form-card .button-light {
+    background: var(--mint);
+    border: 1px solid #c9e7d8;
+    color: var(--green);
+    margin: 0 0 15px
+}
+
+.carrier-form-card .button-dark {
+    margin-top: 2px
+}
+
+.agreement-choices {
+    display: grid;
+    gap: 9px
+}
+
+.agreement-choice {
+    align-items: center;
+    background: #fbfdfc;
+    border: 1px solid #dce5df;
+    border-radius: 10px;
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    font: inherit;
+    justify-content: space-between;
+    padding: 12px 14px;
+    text-align: left;
+    transition: border-color .15s, background .15s
+}
+
+.agreement-choice:hover,
+.agreement-choice.selected {
+    background: #f0f9f4;
+    border-color: var(--green)
+}
+
+.agreement-choice strong,
+.agreement-choice small {
+    display: block
+}
+
+.agreement-choice strong {
+    font-size: 13px
+}
+
+.agreement-choice small {
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 3px
+}
+
+.choice-arrow {
+    color: var(--green);
+    font-size: 18px;
+    font-weight: 700
+}
+
+.choice-empty {
+    background: #f7faf8;
+    border: 1px dashed #cbdad1;
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 13px;
+    margin: 0;
+    padding: 13px 14px
+}
+
+.action-summary,
+.milestone-payout-preview {
+    background: #f5faf7;
+    border: 1px solid #dceee3;
+    border-radius: 10px;
+    color: #52645b;
+    font-size: 13px;
+    line-height: 1.65;
+    margin-top: 14px;
+    padding: 12px 14px
+}
+
+.action-summary:empty,
+.milestone-payout-preview:empty {
+    display: none
+}
+
+.milestone-payout-preview {
+    margin: 11px 0 0
+}
+
+#currentMilestone {
+    background: #f5faf7;
+    border: 1px solid #dceee3;
+    border-radius: 10px;
+    color: #52645b;
+    line-height: 1.65;
+    margin: 0 0 20px;
+    padding: 14px 16px
+}
+
+#currentMilestone:empty {
+    display: none
 }
 
 .form-actions {

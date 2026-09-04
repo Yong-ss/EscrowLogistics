@@ -19,13 +19,10 @@
             </p>
             <section class="form-card" data-role="shipper">
                 <h2>Release the next payment</h2>
-                <p class="form-help">
-                    The final milestone automatically releases any rounding remainder.
-                </p>
-                <div class="field">
-                    <label for="verifyId">Agreement ID</label>
-                    <input id="verifyId" type="number" min="1" value="1" />
-                </div>
+                <p class="form-help">Select an agreement to review the Carrier's completion note and its planned percentage payout.</p>
+                <input id="verifyId" type="hidden" />
+                <div id="verifyAgreementChoices" class="agreement-choices"></div>
+                <div id="verificationMilestone" class="form-help"></div>
                 <div class="form-actions">
                     <button class="button button-dark" onclick="verifyNextMilestone()">
                         Verify and release →

@@ -1,9 +1,28 @@
 // The frontend uses this address to find the deployed contract.
 // Change it after deploying a fresh contract to Ganache.
-const CONTRACT_ADDRESS = "0xD7d8De83BAF87339e020233C3603B079A62879B5";
+const CONTRACT_ADDRESS = "0x73dB46486a8D486B1fd5e1de318e09ff157E8A52";
 
 // ABI describes the contract functions so Web3 can call them from JavaScript.
 const CONTRACT_ABI = [
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "carrier",
+        "type": "address"
+      }
+    ],
+    "name": "AgreementAccepted",
+    "type": "event"
+  },
   {
     "anonymous": false,
     "inputs": [
@@ -77,6 +96,37 @@ const CONTRACT_ABI = [
       }
     ],
     "name": "Funded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "milestoneNo",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "carrier",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "note",
+        "type": "string"
+      }
+    ],
+    "name": "MilestoneSubmitted",
     "type": "event"
   },
   {
@@ -183,6 +233,11 @@ const CONTRACT_ABI = [
         "type": "uint256"
       },
       {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
         "internalType": "address",
         "name": "shipper",
         "type": "address"
@@ -226,6 +281,11 @@ const CONTRACT_ABI = [
         "internalType": "uint256",
         "name": "declaredPayloadValue",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "carrierAccepted",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -290,6 +350,11 @@ const CONTRACT_ABI = [
         "type": "address"
       },
       {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      },
+      {
         "internalType": "uint256",
         "name": "_milestoneCount",
         "type": "uint256"
@@ -313,6 +378,11 @@ const CONTRACT_ABI = [
         "internalType": "string[]",
         "name": "_milestoneDescriptions",
         "type": "string[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_payoutPercentages",
+        "type": "uint256[]"
       }
     ],
     "name": "createAgreement",
@@ -334,9 +404,40 @@ const CONTRACT_ABI = [
         "type": "uint256"
       }
     ],
+    "name": "acceptAgreement",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
     "name": "fund",
     "outputs": [],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_note",
+        "type": "string"
+      }
+    ],
+    "name": "submitMilestone",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -383,6 +484,11 @@ const CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
             "internalType": "address",
             "name": "shipper",
             "type": "address"
@@ -426,6 +532,11 @@ const CONTRACT_ABI = [
             "internalType": "uint256",
             "name": "declaredPayloadValue",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "carrierAccepted",
+            "type": "bool"
           }
         ],
         "internalType": "struct EscrowLogistics.Agreement",
@@ -460,6 +571,21 @@ const CONTRACT_ABI = [
         "internalType": "string",
         "name": "description",
         "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "payoutPercentage",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "submissionNote",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "submitted",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",

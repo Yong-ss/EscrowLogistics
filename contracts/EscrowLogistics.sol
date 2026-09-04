@@ -13,6 +13,7 @@ contract EscrowLogistics {
 
     struct Agreement {
         uint id;
+        string name;                // friendly name so users do not need to remember only the ID
         address shipper;
         address carrier;
         uint totalValue;             // total Ether locked, in Wei (set once funded)
@@ -22,11 +23,15 @@ contract EscrowLogistics {
         uint deadline;               // block.timestamp by which milestones must be done
         Status status;
         uint declaredPayloadValue;   // total payload value declared at creation, in Wei
+        bool carrierAccepted;        // Carrier must accept the work before funds are locked
     }
 
     struct Milestone {
         string name;             // short title, such as "Pickup from warehouse"
         string description;      // plain instructions visible to both sides
+        uint payoutPercentage;   // agreed share of the total escrow, from 1 to 100
+        string submissionNote;   // short update written by the Carrier after completion
+        bool submitted;          // true when the Carrier has sent this milestone for review
     }
 
     // ---------- State ----------
@@ -39,7 +44,9 @@ contract EscrowLogistics {
     // ---------- Events (frontend reads these for history) ----------
     event Registered(address indexed user, Role role);
     event AgreementCreated(uint indexed id, address indexed shipper, address indexed carrier, uint milestoneCount, uint declaredPayloadValue, uint deadline);
+    event AgreementAccepted(uint indexed id, address indexed carrier);
     event Funded(uint indexed id, uint amount);
+    event MilestoneSubmitted(uint indexed id, uint milestoneNo, address carrier, string note);
     event MilestoneVerified(uint indexed id, uint milestoneNo, uint payout, address carrier);
     event AgreementCompleted(uint indexed id);
     event Refunded(uint indexed id, uint amount, address shipper);
@@ -66,23 +73,35 @@ contract EscrowLogistics {
     // Shipper creates an agreement and records the simple plan for every milestone.
     function createAgreement(
         address _carrier,
+        string calldata _name,
         uint _milestoneCount,
         uint _declaredPayloadValue,
         uint _deadline,
         string[] calldata _milestoneNames,
-        string[] calldata _milestoneDescriptions
+        string[] calldata _milestoneDescriptions,
+        uint[] calldata _payoutPercentages
     ) public returns (uint) {
         require(roles[msg.sender] == Role.Shipper, "Only a registered Shipper can create");
         require(roles[_carrier] == Role.Carrier, "Assigned address is not a Carrier");
+        require(bytes(_name).length > 0, "Agreement name is required");
         require(_milestoneCount > 0, "Need at least one milestone");
         require(_milestoneNames.length == _milestoneCount, "Milestone names do not match count");
         require(_milestoneDescriptions.length == _milestoneCount, "Milestone descriptions do not match count");
+        require(_payoutPercentages.length == _milestoneCount, "Payout percentages do not match count");
         require(_declaredPayloadValue > 0, "Declared payload value must be greater than zero");
         require(_deadline > block.timestamp, "Deadline must be in the future");
+
+        uint totalPayoutPercentage;
+        for (uint i = 0; i < _milestoneCount; i++) {
+            require(_payoutPercentages[i] > 0 && _payoutPercentages[i] <= 100, "Payout percentage must be 1 to 100");
+            totalPayoutPercentage += _payoutPercentages[i];
+        }
+        require(totalPayoutPercentage == 100, "Payout percentages must total 100");
 
         agreementCount++;
         agreements[agreementCount] = Agreement(
             agreementCount,
+            _name,
             msg.sender,
             _carrier,
             0,                  // totalValue set on funding
@@ -91,14 +110,15 @@ contract EscrowLogistics {
             0,                  // amountReleased
             _deadline,
             Status.Created,
-            _declaredPayloadValue
+            _declaredPayloadValue,
+            false
         );
 
         // Store the plan in the same order the Shipper entered it.
         for (uint i = 0; i < _milestoneCount; i++) {
             require(bytes(_milestoneNames[i]).length > 0, "Milestone name is required");
             agreementMilestones[agreementCount].push(
-                Milestone(_milestoneNames[i], _milestoneDescriptions[i])
+                Milestone(_milestoneNames[i], _milestoneDescriptions[i], _payoutPercentages[i], "", false)
             );
         }
 
@@ -106,11 +126,24 @@ contract EscrowLogistics {
         return agreementCount;
     }
 
+    // Carrier accepts the assignment before the Shipper deposits escrow funds.
+    function acceptAgreement(uint _id) public {
+        require(_id > 0 && _id <= agreementCount, "Agreement does not exist");
+        Agreement storage a = agreements[_id];
+        require(msg.sender == a.carrier, "Only the assigned Carrier");
+        require(a.status == Status.Created, "Agreement is not awaiting acceptance");
+        require(!a.carrierAccepted, "Agreement already accepted");
+
+        a.carrierAccepted = true;
+        emit AgreementAccepted(_id, msg.sender);
+    }
+
     // ---------- 3. Funding (lock Ether into escrow) ----------
     // Shipper locks the exact declared amount into this agreement.
     function fund(uint _id) public payable onlyShipperOf(_id) {
         Agreement storage a = agreements[_id];
         require(a.status == Status.Created, "Agreement is not awaiting funding");
+        require(a.carrierAccepted, "Carrier has not accepted");
         require(msg.value == a.declaredPayloadValue, "Funded amount must match the declared payload value");
 
         a.totalValue = msg.value;
@@ -120,22 +153,46 @@ contract EscrowLogistics {
     }
 
     // ---------- 4. Milestone verification + progressive payout ----------
+    // Carrier submits a short completion note for the next milestone.
+    function submitMilestone(uint _id, string calldata _note) public {
+        Agreement storage a = agreements[_id];
+        require(msg.sender == a.carrier, "Only the assigned Carrier");
+        require(a.status == Status.Funded, "Agreement is not in progress");
+        require(block.timestamp <= a.deadline, "Deadline has passed");
+        require(bytes(_note).length > 0, "Completion note is required");
+
+        uint currentMilestone = a.milestonesDone;
+        require(
+            !agreementMilestones[_id][currentMilestone].submitted,
+            "Milestone already submitted"
+        );
+
+        agreementMilestones[_id][currentMilestone].submissionNote = _note;
+        agreementMilestones[_id][currentMilestone].submitted = true;
+
+        emit MilestoneSubmitted(_id, currentMilestone + 1, msg.sender, _note);
+    }
+
     // Shipper approves the next step and sends its payment to the Carrier.
     function verifyMilestone(uint _id) public onlyShipperOf(_id) {
         Agreement storage a = agreements[_id];
         require(a.status == Status.Funded, "Agreement is not in progress");
         require(a.milestonesDone < a.milestoneCount, "All milestones already done");
         require(block.timestamp <= a.deadline, "Deadline has passed");
+        require(
+            agreementMilestones[_id][a.milestonesDone].submitted,
+            "Carrier has not submitted this milestone"
+        );
 
         a.milestonesDone++;
 
-        // Release an even share; the final milestone releases the remainder
-        // so rounding never leaves funds stuck in the contract.
+        // Release the percentage agreed for this milestone; the final milestone
+        // receives the remainder so integer rounding never leaves funds stuck.
         uint payout;
         if (a.milestonesDone == a.milestoneCount) {
             payout = a.totalValue - a.amountReleased;
         } else {
-            payout = a.totalValue / a.milestoneCount;
+            payout = (a.totalValue * agreementMilestones[_id][a.milestonesDone - 1].payoutPercentage) / 100;
         }
         a.amountReleased += payout;
 
@@ -178,6 +235,7 @@ contract EscrowLogistics {
     // ---------- 6/7. Views ----------
     // Returns all stored information for one agreement without changing the blockchain.
     function getAgreement(uint _id) public view returns (Agreement memory) {
+        require(_id > 0 && _id <= agreementCount, "Agreement does not exist");
         return agreements[_id];
     }
 
@@ -185,11 +243,23 @@ contract EscrowLogistics {
     function getMilestone(uint _agreementId, uint _milestoneNo)
         public
         view
-        returns (string memory name, string memory description)
+        returns (
+            string memory name,
+            string memory description,
+            uint payoutPercentage,
+            string memory submissionNote,
+            bool submitted
+        )
     {
         require(_milestoneNo < agreementMilestones[_agreementId].length, "Milestone does not exist");
         Milestone memory milestone = agreementMilestones[_agreementId][_milestoneNo];
-        return (milestone.name, milestone.description);
+        return (
+            milestone.name,
+            milestone.description,
+            milestone.payoutPercentage,
+            milestone.submissionNote,
+            milestone.submitted
+        );
     }
 
     // Calculates how much Ether is still locked in the agreement.

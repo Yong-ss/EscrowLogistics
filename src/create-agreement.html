@@ -23,6 +23,10 @@
           </p>
           <div class="form-grid">
             <div class="field full">
+              <label for="agreementName">Agreement name</label>
+              <input id="agreementName" placeholder="e.g. Kuala Lumpur warehouse delivery" required />
+            </div>
+            <div class="field full">
               <label for="carrierAddr">Carrier wallet address</label>
               <input id="carrierAddr" placeholder="0x..." />
             </div>
@@ -31,7 +35,7 @@
               <input id="milestoneCount" type="number" min="1" value="3" />
             </div>
             <div class="field">
-              <label for="payloadValue">Payload value (ETH)</label>
+              <label for="payloadValue">Total escrow amount (ETH)</label>
               <input id="payloadValue" value="3" />
             </div>
             <div class="field">
@@ -41,7 +45,7 @@
           </div>
           <div class="milestone-heading">
             <h2>Milestones</h2>
-            <p class="form-help">Describe what should happen at each step so both sides see the same plan.</p>
+            <p class="form-help">Describe each step and decide what percentage is released after the Shipper verifies it. The total must equal 100%.</p>
           </div>
           <div id="milestoneInputs"></div>
           <div class="form-actions">

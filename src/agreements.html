@@ -21,7 +21,7 @@
           <div class="form-grid">
             <div class="field">
               <label for="viewId">Agreement ID</label>
-              <input id="viewId" type="number" min="1" value="1" />
+            <input id="viewId" type="number" min="1" placeholder="Enter an existing agreement ID" />
             </div>
           </div>
           <div class="form-actions">
@@ -30,6 +30,24 @@
             </button>
           </div>
           <div id="agreementDetails"></div>
+        </section>
+        <section class="table-card" style="margin-top: 18px">
+          <h2>My agreements</h2>
+          <button class="button button-dark" onclick="loadMyAgreements()">
+            Load my agreements
+          </button>
+          <table class="data-table" id="myAgreementsTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Milestones</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </section>
         <section class="table-card" style="margin-top: 18px">
           <h2>Transaction history</h2>

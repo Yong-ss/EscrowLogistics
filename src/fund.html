@@ -13,24 +13,17 @@
       <div data-include="partials/header.html"></div>
       <div class="page-content">
         <p class="form-help">
-          Lock the exact payload value declared when the agreement was created.
+          Choose an accepted agreement. The complete escrow amount and milestone split are already fixed on-chain.
         </p>
         <section class="form-card" data-role="shipper">
           <h2>Secure an agreement</h2>
           <p class="form-help">
-            Funds remain in the contract until milestones are verified or a
-            deadline refund is triggered.
+            After you fund, the Ether stays locked until milestones are verified
+            or a deadline refund is triggered. You cannot change the amount here.
           </p>
-          <div class="form-grid">
-            <div class="field">
-              <label for="fundId">Agreement ID</label>
-              <input id="fundId" type="number" min="1" value="1" />
-            </div>
-            <div class="field">
-              <label for="fundAmount">Amount (ETH)</label>
-              <input id="fundAmount" value="3" />
-            </div>
-          </div>
+          <input id="fundId" type="hidden" />
+          <div id="fundAgreementChoices" class="agreement-choices"></div>
+          <div id="fundSummary" class="action-summary"></div>
           <div class="form-actions">
             <button class="button button-dark" onclick="fundAgreementEscrow()">
               Fund escrow →

@@ -36,4 +36,12 @@ const refreshPageForRole = async () => {
     // not registered yet
     showPanel("registerSection");
   }
+
+  // Agreements page gets a wallet-specific list instead of making users guess IDs.
+  if (document.body.dataset.page === "agreements" && typeof loadMyAgreements === "function") {
+    await loadMyAgreements();
+  }
+  if (currentUserRole === 1 && document.body.dataset.page === "fund" && typeof loadFundableAgreements === "function") await loadFundableAgreements();
+  if (currentUserRole === 1 && document.body.dataset.page === "verify" && typeof loadVerifiableAgreements === "function") await loadVerifiableAgreements();
+  if (currentUserRole === 1 && document.body.dataset.page === "refund" && typeof loadRefundableAgreements === "function") await loadRefundableAgreements();
 };
