@@ -9,7 +9,10 @@ const registerAsRole = async (roleNumber) => {
       return;
     }
 
-    await escrowContract.methods.register(roleNumber).send({ from: connectedAccount });
+    await sendWithEstimatedGas(
+      escrowContract.methods.register(roleNumber),
+      { from: connectedAccount }
+    );
     await refreshPageForRole();
     showStatusMessage("Registered as " + ROLE_NAMES[roleNumber] + ".");
   } catch (error) {

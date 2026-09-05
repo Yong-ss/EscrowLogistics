@@ -73,7 +73,7 @@ const createNewAgreement = async () => {
       return;
     }
 
-    createStep = "checking the agreement with Ganache";
+    createStep = "checking the agreement on the blockchain";
     const createCall = escrowContract.methods
       .createAgreement(
         carrierAddressInput,
@@ -91,10 +91,10 @@ const createNewAgreement = async () => {
     await createCall.call({ from: connectedAccount });
     showStatusMessage("Ready to create the agreement. Confirm the transaction in MetaMask.");
     createStep = "waiting for MetaMask confirmation";
-    const result = await createCall.send({ from: connectedAccount });
+    const result = await sendWithEstimatedGas(createCall, { from: connectedAccount });
 
-    const createdEvent = result.events && result.events.AgreementCreated;
-    const agreementId = createdEvent ? createdEvent.returnValues.id : "";
+    const createdValues = getEventReturnValues(result, "AgreementCreated");
+    const agreementId = createdValues ? createdValues.id : "";
     showStatusMessage(agreementId
       ? "Agreement created successfully. Agreement #" + agreementId + " is waiting for Carrier acceptance."
       : "Agreement created successfully. It is waiting for Carrier acceptance.");
@@ -115,7 +115,10 @@ const fundAgreementEscrow = async () => {
     const fundAmountWei = agreementRecord.declaredPayloadValue;
     const fundAmountEther = web3Client.utils.fromWei(fundAmountWei, "ether");
 
-    await escrowContract.methods.fund(agreementId).send({ from: connectedAccount, value: fundAmountWei });
+    await sendWithEstimatedGas(
+      escrowContract.methods.fund(agreementId),
+      { from: connectedAccount, value: fundAmountWei }
+    );
     showStatusMessage("Funded agreement " + agreementId + " with " + fundAmountEther + " ETH.");
   } catch (error) {
     showFriendlyError(error, "Funding the agreement");
@@ -131,10 +134,17 @@ const verifyNextMilestone = async () => {
       showStatusMessage("Please choose an agreement to verify.", "error");
       return;
     }
-    const result = await escrowContract.methods.verifyMilestone(agreementId).send({ from: connectedAccount });
-    const milestoneEvent = result.events.MilestoneVerified.returnValues;
-    const payoutEther = web3Client.utils.fromWei(milestoneEvent.payout, "ether");
-    showStatusMessage("Milestone " + milestoneEvent.milestoneNo + " verified, paid " + payoutEther + " ETH to carrier.");
+    const result = await sendWithEstimatedGas(
+      escrowContract.methods.verifyMilestone(agreementId),
+      { from: connectedAccount }
+    );
+    const milestoneValues = getEventReturnValues(result, "MilestoneVerified");
+    if (milestoneValues) {
+      const payoutEther = web3Client.utils.fromWei(milestoneValues.payout, "ether");
+      showStatusMessage("Milestone " + milestoneValues.milestoneNo + " verified, paid " + payoutEther + " ETH to carrier.");
+    } else {
+      showStatusMessage("Milestone verified and payment released to the Carrier.");
+    }
     await loadMilestoneForVerification();
   } catch (error) {
     showFriendlyError(error, "Verifying the milestone");
@@ -192,17 +202,21 @@ const renderShipperChoices = (action, agreements) => {
 
 // Selects an agreement and refreshes the helpful amount or milestone preview.
 const chooseShipperAgreement = async (action, agreementId) => {
-  const input = document.getElementById(action + "Id");
-  const container = document.getElementById(action + "AgreementChoices");
-  if (!input || !container) return;
-  input.value = agreementId;
-  container.querySelectorAll(".agreement-choice").forEach((choice) => choice.classList.toggle("selected", choice.querySelector("small").textContent.includes("#" + agreementId + " ·") || choice.querySelector("small").textContent === "Agreement #" + agreementId));
-  if (action === "fund") {
-    const agreement = await escrowContract.methods.getAgreement(agreementId).call();
-    const summary = document.getElementById("fundSummary");
-    if (summary) summary.innerHTML = "<b>Amount to lock:</b> " + web3Client.utils.fromWei(agreement.declaredPayloadValue, "ether") + " ETH<br><b>Payment is released:</b> after each milestone is verified.";
+  try {
+    const input = document.getElementById(action + "Id");
+    const container = document.getElementById(action + "AgreementChoices");
+    if (!input || !container) return;
+    input.value = agreementId;
+    container.querySelectorAll(".agreement-choice").forEach((choice) => choice.classList.toggle("selected", choice.querySelector("small").textContent.includes("#" + agreementId + " ·") || choice.querySelector("small").textContent === "Agreement #" + agreementId));
+    if (action === "fund") {
+      const agreement = await escrowContract.methods.getAgreement(agreementId).call();
+      const summary = document.getElementById("fundSummary");
+      if (summary) summary.innerHTML = "<b>Amount to lock:</b> " + web3Client.utils.fromWei(agreement.declaredPayloadValue, "ether") + " ETH<br><b>Payment is released:</b> after each milestone is verified.";
+    }
+    if (action === "verify") await loadMilestoneForVerification();
+  } catch (error) {
+    showFriendlyError(error, "Loading the selected agreement");
   }
-  if (action === "verify") await loadMilestoneForVerification();
 };
 
 // Shows the current milestone and the Carrier's note before the Shipper verifies it.
@@ -246,9 +260,17 @@ const requestRefund = async () => {
       showStatusMessage("Please choose an agreement for the refund.", "error");
       return;
     }
-    const result = await escrowContract.methods.refund(agreementId).send({ from: connectedAccount });
-    const refundedEther = web3Client.utils.fromWei(result.events.Refunded.returnValues.amount, "ether");
-    showStatusMessage("Refunded " + refundedEther + " ETH to shipper for agreement " + agreementId + ".");
+    const result = await sendWithEstimatedGas(
+      escrowContract.methods.refund(agreementId),
+      { from: connectedAccount }
+    );
+    const refundedValues = getEventReturnValues(result, "Refunded");
+    if (refundedValues) {
+      const refundedEther = web3Client.utils.fromWei(refundedValues.amount, "ether");
+      showStatusMessage("Refunded " + refundedEther + " ETH to shipper for agreement " + agreementId + ".");
+    } else {
+      showStatusMessage("Refund completed for agreement " + agreementId + ".");
+    }
   } catch (error) {
     showFriendlyError(error, "Requesting the refund");
   }

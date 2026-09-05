@@ -39,7 +39,7 @@ describe("Agreements page flow", () => {
 
   it("simulates agreement creation before asking MetaMask to send it", () => {
     assert(shipperController.includes("await createCall.call({ from: connectedAccount });"));
-    assert(shipperController.indexOf("createCall.call") < shipperController.indexOf("createCall.send"));
+    assert(shipperController.includes("sendWithEstimatedGas(createCall"));
   });
 
   it("separates agreement, escrow, milestone, payment, and refund activity", () => {

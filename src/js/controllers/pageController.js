@@ -37,7 +37,9 @@ const refreshPageForRole = async () => {
     showPanel("historySection");
     showPanel("agreementDetailsSection");
     showPanel("agreementHistorySection");
-    if (typeof loadCarrierDashboard === "function") await loadCarrierDashboard();
+    if (document.body.dataset.page === "jobs" && typeof loadCarrierDashboard === "function") {
+      await loadCarrierDashboard();
+    }
   } else {
     // not registered yet
     showPanel("registerSection");

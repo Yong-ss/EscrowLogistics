@@ -131,9 +131,11 @@ const loadAgreementDetails = async (agreementId, knownAgreement = null) => {
 // Builds a readable history timeline for the selected agreement only.
 const loadAgreementHistory = async (agreementId, agreementName = "") => {
   try {
+    // Public RPC nodes limit event searches, so only read the latest 10,000 blocks.
+    const latestBlock = await web3Client.eth.getBlockNumber();
     const pastEvents = await escrowContract.getPastEvents("allEvents", {
-      fromBlock: 0,
-      toBlock: "latest",
+      fromBlock: Math.max(0, latestBlock - 9999),
+      toBlock: latestBlock,
     });
 
     // An agreement ID is unique, so this removes events from every other agreement.

@@ -7,6 +7,7 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "@truffle/hdwallet-provider": "^2.1.15",
     "express": "^4.19.2"
   }
 }

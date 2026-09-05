@@ -90,7 +90,10 @@ const chooseCarrierAgreement = (action, agreementId) => {
 const acceptCarrierAgreement = async () => {
   try {
     const agreementId = document.getElementById("acceptAgreementId").value;
-    await escrowContract.methods.acceptAgreement(agreementId).send({ from: connectedAccount });
+    await sendWithEstimatedGas(
+      escrowContract.methods.acceptAgreement(agreementId),
+      { from: connectedAccount }
+    );
     showStatusMessage("Agreement " + agreementId + " accepted.");
     await loadCarrierJobs();
   } catch (error) {
@@ -134,9 +137,10 @@ const submitCurrentMilestone = async () => {
       return;
     }
 
-    await escrowContract.methods
-      .submitMilestone(agreementId, note)
-      .send({ from: connectedAccount });
+    await sendWithEstimatedGas(
+      escrowContract.methods.submitMilestone(agreementId, note),
+      { from: connectedAccount }
+    );
 
     document.getElementById("completionNote").value = "";
     showStatusMessage("Milestone submitted for Shipper review.");
