@@ -3,30 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Agreements · Escrow Logistics</title>
+    <title>Agreement details · Escrow Logistics</title>
     <link rel="stylesheet" href="css/style.css" />
   </head>
 
-  <body data-page="agreements" data-title="Agreements">
+  <body data-page="agreement-details" data-title="Agreement details">
     <div data-include="partials/sidebar.html"></div>
     <main class="app-shell">
       <div data-include="partials/header.html"></div>
       <div class="page-content">
-        <p class="form-help">
-          Choose an agreement to view its progress, milestone plan, and payment history.
-        </p>
+        <a class="back-link" href="agreements.html">← Back to agreements</a>
 
-        <section class="form-card agreement-list-card">
+        <section id="agreementDetailsSection" class="form-card agreement-detail-card hidden">
+          <div class="detail-heading">
+            <div>
+              <p class="eyebrow">AGREEMENT DETAILS</p>
+              <h2 id="agreementTitle">Loading agreement...</h2>
+            </div>
+            <span id="agreementStatus" class="status-pill"></span>
+          </div>
+          <div id="agreementDetails"></div>
+        </section>
+
+        <section id="agreementHistorySection" class="table-card agreement-history-card hidden">
           <div class="section-card-heading">
             <div>
-              <p class="eyebrow">YOUR WORKSPACE</p>
-              <h2>My agreements</h2>
+              <p class="eyebrow">ON-CHAIN RECORD</p>
+              <h2>Agreement activity</h2>
             </div>
-            <span class="section-count" id="agreementCount">—</span>
           </div>
-          <div id="agreementList" class="agreement-list">
-            <p class="choice-empty">Connect your wallet to load your agreements.</p>
-          </div>
+          <p class="form-help">A chronological record of agreement setup, escrow, milestones, payments, and refunds.</p>
+          <div class="history-list" id="historyList"></div>
         </section>
 
         <div id="status" class="status-message"></div>

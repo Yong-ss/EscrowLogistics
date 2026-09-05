@@ -519,6 +519,230 @@ body {
     border-color: var(--green)
 }
 
+.section-card-heading {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px
+}
+
+.section-card-heading .eyebrow {
+    margin-bottom: 4px
+}
+
+.section-count {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700
+}
+
+.agreement-list {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr))
+}
+
+.agreement-card {
+    background: #fbfdfc;
+    border: 1px solid #dce5df;
+    border-radius: 12px;
+    color: var(--ink);
+    display: block;
+    padding: 18px;
+    text-decoration: none;
+    transition: border-color .15s, box-shadow .15s, transform .15s
+}
+
+.agreement-card:hover {
+    border-color: #9ccbb3;
+    box-shadow: 0 10px 24px #1f48340d;
+    transform: translateY(-2px)
+}
+
+.agreement-card-top,
+.agreement-card-meta,
+.agreement-card-bottom {
+    align-items: center;
+    display: flex;
+    justify-content: space-between
+}
+
+.agreement-id,
+.agreement-card-meta,
+.agreement-card-bottom {
+    color: var(--muted);
+    font-size: 12px
+}
+
+.agreement-card h3 {
+    font-size: 17px;
+    margin: 19px 0 14px
+}
+
+.agreement-card-meta {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 14px
+}
+
+.agreement-card-bottom {
+    gap: 10px;
+    padding-top: 14px
+}
+
+.agreement-card .card-arrow {
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 750;
+    position: static
+}
+
+.status-pill {
+    background: var(--mint);
+    border-radius: 99px;
+    color: var(--green);
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 750;
+    padding: 5px 9px
+}
+
+.back-link {
+    color: var(--green);
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    margin: 0 0 18px;
+    text-decoration: none
+}
+
+.back-link:hover {
+    text-decoration: underline
+}
+
+.agreement-detail-card {
+    margin-bottom: 18px
+}
+
+.detail-heading {
+    align-items: flex-start;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+    margin-bottom: 21px;
+    padding-bottom: 18px
+}
+
+.detail-heading h2 {
+    margin: 0
+}
+
+.detail-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr))
+}
+
+.detail-item {
+    background: #f7faf8;
+    border-radius: 9px;
+    display: grid;
+    gap: 3px;
+    padding: 12px 14px
+}
+
+.detail-item span {
+    color: var(--muted);
+    font-size: 11px
+}
+
+.detail-item strong {
+    font-size: 13px;
+    overflow-wrap: anywhere
+}
+
+.agreement-history-card {
+    margin-top: 18px
+}
+
+.agreement-history-card .form-help {
+    margin-bottom: 15px
+}
+
+.history-list {
+    border-top: 1px solid var(--line)
+}
+
+.history-item {
+    align-items: flex-start;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    gap: 12px;
+    padding: 14px 0
+}
+
+.history-dot {
+    background: var(--green);
+    border: 4px solid var(--mint);
+    border-radius: 50%;
+    flex: 0 0 16px;
+    height: 16px;
+    margin-top: 2px;
+    width: 16px
+}
+
+.history-item strong,
+.history-item small {
+    display: block
+}
+
+.history-item-top {
+    margin-bottom: 5px
+}
+
+.history-type {
+    background: #eef2ef;
+    border-radius: 99px;
+    color: var(--muted);
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    padding: 4px 7px
+}
+
+.history-type-agreement {
+    background: #e8f1f5;
+    color: var(--navy)
+}
+
+.history-type-escrow,
+.history-type-payment {
+    background: var(--mint);
+    color: var(--green)
+}
+
+.history-type-milestone {
+    background: var(--orange);
+    color: #ad703b
+}
+
+.history-type-refund {
+    background: #fff1ef;
+    color: #a3473c
+}
+
+.history-item strong {
+    font-size: 13px;
+    font-weight: 650
+}
+
+.history-item small {
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 3px
+}
+
 .agreement-choice strong,
 .agreement-choice small {
     display: block
@@ -748,6 +972,11 @@ body {
     }
 
     .form-grid {
+        grid-template-columns: 1fr
+    }
+
+    .agreement-list,
+    .detail-grid {
         grid-template-columns: 1fr
     }
 

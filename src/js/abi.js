@@ -1,6 +1,6 @@
 // The frontend uses this address to find the deployed contract.
 // Change it after deploying a fresh contract to Ganache.
-const CONTRACT_ADDRESS = "0x73dB46486a8D486B1fd5e1de318e09ff157E8A52";
+const CONTRACT_ADDRESS = "0x627156522607295395572b71AFBF413745613E8C";
 
 // ABI describes the contract functions so Web3 can call them from JavaScript.
 const CONTRACT_ABI = [

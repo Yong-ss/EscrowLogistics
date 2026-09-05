@@ -144,6 +144,7 @@ contract EscrowLogistics {
         Agreement storage a = agreements[_id];
         require(a.status == Status.Created, "Agreement is not awaiting funding");
         require(a.carrierAccepted, "Carrier has not accepted");
+        require(block.timestamp <= a.deadline, "Deadline has passed");
         require(msg.value == a.declaredPayloadValue, "Funded amount must match the declared payload value");
 
         a.totalValue = msg.value;
@@ -265,6 +266,9 @@ contract EscrowLogistics {
     // Calculates how much Ether is still locked in the agreement.
     function escrowBalance(uint _id) public view returns (uint) {
         Agreement memory a = agreements[_id];
+        // A refunded agreement has no funds left in escrow, even though the
+        // historical totalValue and amountReleased values remain readable.
+        if (a.status == Status.Refunded) return 0;
         return a.totalValue - a.amountReleased;
     }
 }

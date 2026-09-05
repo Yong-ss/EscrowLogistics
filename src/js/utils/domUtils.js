@@ -10,12 +10,22 @@ function showStatusMessage(message, type = "success") {
 
 // Turns long MetaMask and Solidity errors into a useful next step for the user.
 function getFriendlyError(error, action) {
-  const raw = String(
-    (error && (error.message || error.data && error.data.message)) || error || ""
-  ).toLowerCase();
+  // Some Web3 providers hide the Solidity reason inside nested error data.
+  let raw = String((error && error.message) || error || "");
+  try { raw += " " + JSON.stringify(error); } catch (ignored) { /* keep the readable message */ }
+  raw = raw.toLowerCase();
 
   if (raw.includes("user denied") || raw.includes("user rejected") || raw.includes("4001")) {
     return "Transaction cancelled in MetaMask. Nothing was changed.";
+  }
+  if (raw.includes("isaddress is not a function")) {
+    return "The wallet connection library did not load correctly. Refresh the page and try again.";
+  }
+  if (raw.includes("invalid number") || raw.includes("invalid address") || raw.includes("invalid value")) {
+    return "One of the form values is not valid. Check the Carrier address, amount, and milestone fields.";
+  }
+  if (raw.includes("cannot read properties") || raw.includes("is not a function")) {
+    return "The page was not ready when the form was submitted. Refresh the page and try again.";
   }
   if (raw.includes("carrier has not submitted")) {
     return "This milestone is not ready yet. Ask the Carrier to submit a completion note first.";
@@ -25,6 +35,9 @@ function getFriendlyError(error, action) {
   }
   if (raw.includes("deadline has passed")) {
     return "This agreement is past its deadline, so the next milestone cannot be verified.";
+  }
+  if (raw.includes("deadline must be in the future")) {
+    return "The deadline must be later than the current Ganache time. Increase the deadline and try again.";
   }
   if (raw.includes("deadline has not passed")) {
     return "A refund can only be requested after the agreement deadline.";
@@ -49,6 +62,27 @@ function getFriendlyError(error, action) {
   }
   if (raw.includes("assigned address is not a carrier")) {
     return "The assigned wallet is not registered as a Carrier. Check the address and try again.";
+  }
+  if (raw.includes("agreement name is required")) {
+    return "Please give this agreement a name before creating it.";
+  }
+  if (raw.includes("need at least one milestone")) {
+    return "Add at least one milestone to this agreement.";
+  }
+  if (raw.includes("milestone name is required")) {
+    return "Every milestone needs a name before the agreement can be created.";
+  }
+  if (raw.includes("milestone names do not match") || raw.includes("milestone descriptions do not match")) {
+    return "The milestone information does not match the milestone count. Check the form and try again.";
+  }
+  if (raw.includes("declared payload value must be greater")) {
+    return "The total escrow amount must be greater than zero ETH.";
+  }
+  if (raw.includes("payout percentage must be 1 to 100")) {
+    return "Each milestone payout share must be between 1% and 100%.";
+  }
+  if (raw.includes("payout percentages must total 100")) {
+    return "Milestone payout shares must add up to exactly 100%.";
   }
   if (raw.includes("agreement does not exist")) {
     return "This agreement could not be found. Please choose an agreement from the list.";
@@ -77,7 +111,7 @@ function getFriendlyError(error, action) {
   if (raw.includes("network") || raw.includes("wrong chain") || raw.includes("chainid")) {
     return "MetaMask may be connected to the wrong network. Connect it to the Ganache network and try again.";
   }
-  return action + " could not be completed. Check MetaMask and try again.";
+  return action + " stopped before MetaMask. Press F12, open Console, and check the red error for the exact cause.";
 }
 
 // Logs the technical detail for debugging but keeps it away from normal users.

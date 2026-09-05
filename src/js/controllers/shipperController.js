@@ -2,37 +2,104 @@
 
 // Collects the form and creates a new agreement on the blockchain.
 const createNewAgreement = async () => {
+  let createStep = "starting";
   try {
-    const carrierAddressInput = document.getElementById("carrierAddr").value;
+    createStep = "checking wallet connection";
+    if (!connectedAccount || !escrowContract || !web3Client) {
+      showStatusMessage("Connect your Shipper wallet before creating an agreement.", "error");
+      return;
+    }
+
+    const carrierAddressInput = document.getElementById("carrierAddr").value.trim();
     const agreementNameInput = document.getElementById("agreementName").value.trim();
-    const milestoneCountInput = document.getElementById("milestoneCount").value;
-    const payloadValueEther = document.getElementById("payloadValue").value;
+    const milestoneCount = Number(document.getElementById("milestoneCount").value);
+    const payloadValueEther = document.getElementById("payloadValue").value.trim();
+    const deadlineMinutes = Number(document.getElementById("deadlineMins").value);
+
+    if (!agreementNameInput) {
+      showStatusMessage("Please give this agreement a name.", "error");
+      return;
+    }
+    if (!web3Client.utils.isAddress(carrierAddressInput)) {
+      showStatusMessage("Please enter a valid Carrier wallet address starting with 0x.", "error");
+      return;
+    }
+    if (carrierAddressInput.toLowerCase() === connectedAccount.toLowerCase()) {
+      showStatusMessage("The Carrier wallet must be different from your Shipper wallet.", "error");
+      return;
+    }
+    if (!Number.isInteger(milestoneCount) || milestoneCount < 1) {
+      showStatusMessage("Milestone count must be a whole number greater than zero.", "error");
+      return;
+    }
+    if (!payloadValueEther || !Number.isFinite(Number(payloadValueEther)) || Number(payloadValueEther) <= 0) {
+      showStatusMessage("Total escrow amount must be greater than zero ETH.", "error");
+      return;
+    }
+    if (!Number.isInteger(deadlineMinutes) || deadlineMinutes < 1) {
+      showStatusMessage("Deadline must be at least 1 minute from now.", "error");
+      return;
+    }
+
     const payloadValueWei = web3Client.utils.toWei(payloadValueEther, "ether");
-    const deadlineMinutesInput = parseInt(document.getElementById("deadlineMins").value, 10);
-    const deadlineTimestamp = Math.floor(Date.now() / 1000) + deadlineMinutesInput * 60;
+    const latestBlock = await web3Client.eth.getBlock("latest");
+    const deadlineTimestamp = Number(latestBlock.timestamp) + deadlineMinutes * 60;
     const milestoneInputs = getMilestoneInputs();
+    if (milestoneInputs.names.length !== milestoneCount) {
+      showStatusMessage("The milestone fields do not match the milestone count.", "error");
+      return;
+    }
+    const emptyNameIndex = milestoneInputs.names.findIndex((name) => !name);
+    if (emptyNameIndex >= 0) {
+      showStatusMessage("Please give Milestone " + (emptyNameIndex + 1) + " a name.", "error");
+      return;
+    }
+    const invalidPercentage = milestoneInputs.payoutPercentages.some((percentage) =>
+      !Number.isInteger(percentage) || percentage < 1 || percentage > 100
+    );
+    if (invalidPercentage) {
+      showStatusMessage("Each milestone payout share must be a whole number from 1% to 100%.", "error");
+      return;
+    }
     if (milestoneInputs.payoutPercentages.reduce((sum, value) => sum + value, 0) !== 100) {
       showStatusMessage("Payout shares must add up to 100%.", "error");
       return;
     }
 
-    const result = await escrowContract.methods
+    createStep = "checking Carrier registration";
+    const carrierRole = Number(await escrowContract.methods.roles(carrierAddressInput).call());
+    if (carrierRole !== 2) {
+      showStatusMessage("This wallet is not registered as a Carrier. Ask the Carrier to register first.", "error");
+      return;
+    }
+
+    createStep = "checking the agreement with Ganache";
+    const createCall = escrowContract.methods
       .createAgreement(
         carrierAddressInput,
         agreementNameInput,
-        milestoneCountInput,
+        milestoneCount,
         payloadValueWei,
         deadlineTimestamp,
         milestoneInputs.names,
         milestoneInputs.descriptions,
         milestoneInputs.payoutPercentages
-      )
-      .send({ from: connectedAccount });
+      );
 
-    const agreementId = result.events.AgreementCreated.returnValues.id;
-    showStatusMessage("Agreement created with ID " + agreementId + ".");
+    // Simulate the contract first, so a rejected form shows a clear message
+    // without opening MetaMask or asking the user to confirm a doomed transaction.
+    await createCall.call({ from: connectedAccount });
+    showStatusMessage("Ready to create the agreement. Confirm the transaction in MetaMask.");
+    createStep = "waiting for MetaMask confirmation";
+    const result = await createCall.send({ from: connectedAccount });
+
+    const createdEvent = result.events && result.events.AgreementCreated;
+    const agreementId = createdEvent ? createdEvent.returnValues.id : "";
+    showStatusMessage(agreementId
+      ? "Agreement created successfully. Agreement #" + agreementId + " is waiting for Carrier acceptance."
+      : "Agreement created successfully. It is waiting for Carrier acceptance.");
   } catch (error) {
-    showFriendlyError(error, "Creating the agreement");
+    showFriendlyError(error, "Creating the agreement (" + createStep + ")");
   }
 };
 
@@ -74,43 +141,38 @@ const verifyNextMilestone = async () => {
   }
 };
 
+// Reads all agreements created by the connected Shipper for the action pages.
+const getAgreementsForCurrentShipper = async () => {
+  const count = Number(await escrowContract.methods.agreementCount().call());
+  const agreements = [];
+  for (let id = 1; id <= count; id++) {
+    const agreement = await escrowContract.methods.getAgreement(id).call();
+    if (agreement.shipper.toLowerCase() === connectedAccount.toLowerCase()) agreements.push(agreement);
+  }
+  return agreements;
+};
+
 // Displays only this Shipper's accepted agreements that are ready for funding.
 const loadFundableAgreements = async () => {
   try {
-    const count = Number(await escrowContract.methods.agreementCount().call());
-    const agreements = [];
-    for (let id = 1; id <= count; id++) {
-      const agreement = await escrowContract.methods.getAgreement(id).call();
-      if (agreement.shipper.toLowerCase() === connectedAccount.toLowerCase() &&
-          Number(agreement.status) === 0 && agreement.carrierAccepted) agreements.push(agreement);
-    }
-    renderShipperChoices("fund", agreements);
+    const agreements = await getAgreementsForCurrentShipper();
+    renderShipperChoices("fund", agreements.filter((agreement) => Number(agreement.status) === 0 && agreement.carrierAccepted));
   } catch (error) { showFriendlyError(error, "Loading funding options"); }
 };
 
 // Displays only funded agreements whose next milestone can be verified.
 const loadVerifiableAgreements = async () => {
   try {
-    const count = Number(await escrowContract.methods.agreementCount().call());
-    const agreements = [];
-    for (let id = 1; id <= count; id++) {
-      const agreement = await escrowContract.methods.getAgreement(id).call();
-      if (agreement.shipper.toLowerCase() === connectedAccount.toLowerCase() && Number(agreement.status) === 1) agreements.push(agreement);
-    }
-    renderShipperChoices("verify", agreements);
+    const agreements = await getAgreementsForCurrentShipper();
+    renderShipperChoices("verify", agreements.filter((agreement) => Number(agreement.status) === 1));
   } catch (error) { showFriendlyError(error, "Loading verification options"); }
 };
 
 // Displays funded agreements so the Shipper can choose a refund candidate by name.
 const loadRefundableAgreements = async () => {
   try {
-    const count = Number(await escrowContract.methods.agreementCount().call());
-    const agreements = [];
-    for (let id = 1; id <= count; id++) {
-      const agreement = await escrowContract.methods.getAgreement(id).call();
-      if (agreement.shipper.toLowerCase() === connectedAccount.toLowerCase() && Number(agreement.status) === 1) agreements.push(agreement);
-    }
-    renderShipperChoices("refund", agreements);
+    const agreements = await getAgreementsForCurrentShipper();
+    renderShipperChoices("refund", agreements.filter((agreement) => Number(agreement.status) === 1));
   } catch (error) { showFriendlyError(error, "Loading refund options"); }
 };
 
