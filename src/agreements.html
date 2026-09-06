@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Agreements · Escrow Logistics</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body data-page="agreements" data-title="Agreements">
+    <div data-include="partials/sidebar.html"></div>
+    <main class="app-shell">
+      <div data-include="partials/header.html"></div>
+      <div class="page-content">
+        <p class="form-help">
+          Choose an agreement to view its progress, milestone plan, and payment history.
+        </p>
+
+        <section class="form-card agreement-list-card">
+          <div class="section-card-heading">
+            <div>
+              <p class="eyebrow">YOUR WORKSPACE</p>
+              <h2>My agreements</h2>
+            </div>
+            <span class="section-count" id="agreementCount">—</span>
+          </div>
+          <div id="agreementList" class="agreement-list">
+            <p class="choice-empty">Connect your wallet to load your agreements.</p>
+          </div>
+        </section>
+
+        <div id="status" class="status-message"></div>
+      </div>
+      <div data-include="partials/footer.html"></div>
+    </main>
+    <script src="js/controllers/agreementController.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <script src="js/abi.js"></script>
+    <script src="js/utils/profileUtils.js"></script>
+    <script src="js/utils/formatUtils.js"></script>
+    <script src="js/utils/domUtils.js"></script>
+    <script src="js/services/walletConnection.js"></script>
+    <script src="js/services/contractConnection.js"></script>
+    <script src="js/controllers/pageController.js"></script>
+    <script src="js/siteShell.js"></script>
+  </body>
+</html>

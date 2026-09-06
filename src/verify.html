@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Verify Milestone · Escrow Logistics</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body data-page="verify" data-title="Verify Milestone">
+    <div data-include="partials/sidebar.html"></div>
+    <main class="app-shell">
+        <div data-include="partials/header.html"></div>
+        <div class="page-content">
+            <p class="form-help">
+                Approve the next delivery milestone and release its share to the
+                assigned Carrier.
+            </p>
+            <section class="form-card" data-role="shipper">
+                <h2>Release the next payment</h2>
+                <p class="form-help">Select an agreement to review the Carrier's completion note and its planned percentage payout.</p>
+                <input id="verifyId" type="hidden" />
+                <div id="verifyAgreementChoices" class="agreement-choices"></div>
+                <div id="verificationMilestone" class="form-help"></div>
+                <div class="form-actions">
+                    <button class="button button-dark" onclick="verifyNextMilestone()">
+                        Verify and release →
+                    </button>
+                </div>
+            </section>
+            <div id="status" class="status-message"></div>
+        </div>
+      <div data-include="partials/footer.html"></div>
+    </main>
+    <script src="js/controllers/shipperController.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <script src="js/abi.js"></script>
+    <script src="js/utils/profileUtils.js"></script>
+    <script src="js/utils/formatUtils.js"></script>
+    <script src="js/utils/domUtils.js"></script>
+    <script src="js/services/walletConnection.js"></script>
+    <script src="js/services/contractConnection.js"></script>
+    <script src="js/controllers/pageController.js"></script>
+    <script src="js/siteShell.js"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Fund Escrow · Escrow Logistics</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body data-page="fund" data-title="Fund Escrow">
+    <div data-include="partials/sidebar.html"></div>
+    <main class="app-shell">
+      <div data-include="partials/header.html"></div>
+      <div class="page-content">
+        <p class="form-help">
+          Choose an accepted agreement. The complete escrow amount and milestone split are already fixed on-chain.
+        </p>
+        <section class="form-card" data-role="shipper">
+          <h2>Secure an agreement</h2>
+          <p class="form-help">
+            After you fund, the Ether stays locked until milestones are verified
+            or a deadline refund is triggered. You cannot change the amount here.
+          </p>
+          <input id="fundId" type="hidden" />
+          <div id="fundAgreementChoices" class="agreement-choices"></div>
+          <div id="fundSummary" class="action-summary"></div>
+          <div class="form-actions">
+            <button class="button button-dark" onclick="fundAgreementEscrow()">
+              Fund escrow →
+            </button>
+          </div>
+        </section>
+        <div id="status" class="status-message"></div>
+      </div>
+      <div data-include="partials/footer.html"></div>
+    </main>
+    <script src="js/controllers/shipperController.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <script src="js/abi.js"></script>
+    <script src="js/utils/profileUtils.js"></script>
+    <script src="js/utils/formatUtils.js"></script>
+    <script src="js/utils/domUtils.js"></script>
+    <script src="js/services/walletConnection.js"></script>
+    <script src="js/services/contractConnection.js"></script>
+    <script src="js/controllers/pageController.js"></script>
+    <script src="js/siteShell.js"></script>
+  </body>
+</html>
+
+

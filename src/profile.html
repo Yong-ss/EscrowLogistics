@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Profile · Escrow Logistics</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body data-page="profile" data-title="Profile">
+    <div data-include="partials/sidebar.html"></div>
+    <main class="app-shell">
+      <div data-include="partials/header.html"></div>
+      <div class="page-content">
+        <p class="form-help">
+          Keep a simple contact profile for this wallet. Your role and agreements remain on-chain.
+        </p>
+        <section class="profile-layout">
+          <div class="form-card profile-card">
+            <div class="profile-identity">
+              <div class="profile-avatar-wrap">
+                <span id="profileInitials" class="profile-avatar">U</span>
+                <img id="profileAvatar" class="profile-avatar hidden" alt="Profile avatar" />
+              </div>
+              <div>
+                <p class="eyebrow">LOCAL PROFILE</p>
+                <h2 id="profileDisplayName">Your profile</h2>
+                <span id="profileRole" class="status-pill">Not registered</span>
+              </div>
+            </div>
+
+            <div class="profile-wallet">
+              <span>Wallet</span>
+              <strong id="profileAccount">Wallet not connected</strong>
+            </div>
+
+            <form id="profileForm" onsubmit="saveProfileForm(event)">
+              <div class="form-grid">
+                <div class="field full">
+                  <label for="profileName">Name</label>
+                  <input id="profileName" maxlength="80" required placeholder="e.g. Alex Tan" disabled />
+                </div>
+                <div class="field">
+                  <label for="profileEmail">Email</label>
+                  <input id="profileEmail" type="email" maxlength="120" placeholder="e.g. alex@example.com" disabled />
+                </div>
+                <div class="field">
+                  <label for="profilePhone">Contact number</label>
+                  <input id="profilePhone" type="tel" maxlength="40" placeholder="e.g. +60 12 345 6789" disabled />
+                </div>
+                <div class="field full">
+                  <label for="profileAvatarInput">Avatar (optional)</label>
+                  <input id="profileAvatarInput" type="file" accept="image/*" disabled />
+                  <small class="field-help">PNG, JPG, GIF, or WEBP up to 1 MB. Stored only in this browser.</small>
+                </div>
+              </div>
+              <div class="form-actions profile-actions">
+                <button id="removeAvatarButton" class="button button-light" type="button" onclick="removeProfileAvatar()" disabled>
+                  Remove photo
+                </button>
+                <button class="button button-outline" type="button" onclick="logoutWallet()" disabled>
+                  Log out
+                </button>
+                <button class="button button-dark" type="submit" disabled>
+                  Save profile →
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <aside class="empty-card profile-note">
+            <p class="eyebrow">HOW THIS WORKS</p>
+            <h2>Wallet first</h2>
+            <p>Your wallet is the dApp identity. The current Shipper or Carrier role is always read from the smart contract.</p>
+            <p>Name, email, contact number, and the optional photo are local demo profile details. They are not public blockchain data.</p>
+          </aside>
+        </section>
+        <div id="status" class="status-message"></div>
+      </div>
+      <div data-include="partials/footer.html"></div>
+    </main>
+    <script src="js/utils/profileUtils.js"></script>
+    <script src="js/controllers/profileController.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <script src="js/abi.js"></script>
+    <script src="js/utils/formatUtils.js"></script>
+    <script src="js/utils/domUtils.js"></script>
+    <script src="js/services/walletConnection.js"></script>
+    <script src="js/services/contractConnection.js"></script>
+    <script src="js/controllers/pageController.js"></script>
+    <script src="js/siteShell.js"></script>
+  </body>
+</html>

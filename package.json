@@ -1,0 +1,13 @@
+{
+  "name": "escrow-logistics-dapp",
+  "version": "1.0.0",
+  "description": "Decentralized Escrow and Milestone-Based Logistics Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^2.1.15",
+    "express": "^4.19.2"
+  }
+}

@@ -1,0 +1,17 @@
+<header class="topbar">
+  <button class="menu-button" onclick="toggleSidebar()">☰</button>
+  <div>
+    <p class="eyebrow">ESCROW LOGISTICS</p>
+    <h1 data-page-title>Escrow Logistics</h1>
+  </div>
+  <div class="wallet-area">
+    <div class="wallet-profile hidden" id="walletProfile" aria-label="Connected wallet">
+      <span class="wallet-avatar" id="headerAvatar" aria-hidden="true">U</span>
+      <span class="wallet-identity">
+        <strong class="wallet-name" id="headerName">Unnamed user</strong>
+        <small class="wallet-role hidden" id="roleBadge">Not registered</small>
+      </span>
+    </div>
+    <button id="walletButton" class="button button-dark" onclick="handleWalletButtonClick()">Connect wallet</button>
+  </div>
+</header>

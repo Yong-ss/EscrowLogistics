@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Agreement details · Escrow Logistics</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body data-page="agreement-details" data-title="Agreement details">
+    <div data-include="partials/sidebar.html"></div>
+    <main class="app-shell">
+      <div data-include="partials/header.html"></div>
+      <div class="page-content">
+        <a class="back-link" href="agreements.html">← Back to agreements</a>
+
+        <section id="agreementDetailsSection" class="form-card agreement-detail-card hidden">
+          <div class="detail-heading">
+            <div>
+              <p class="eyebrow">AGREEMENT DETAILS</p>
+              <h2 id="agreementTitle">Loading agreement...</h2>
+            </div>
+            <span id="agreementStatus" class="status-pill"></span>
+          </div>
+          <div id="agreementDetails"></div>
+        </section>
+
+        <section id="agreementHistorySection" class="table-card agreement-history-card hidden">
+          <div class="section-card-heading">
+            <div>
+              <p class="eyebrow">ON-CHAIN RECORD</p>
+              <h2>Agreement activity</h2>
+            </div>
+          </div>
+          <p class="form-help">A chronological record of agreement setup, escrow, milestones, payments, and refunds.</p>
+          <div class="history-list" id="historyList"></div>
+        </section>
+
+        <div id="status" class="status-message"></div>
+      </div>
+      <div data-include="partials/footer.html"></div>
+    </main>
+    <script src="js/controllers/agreementController.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <script src="js/abi.js"></script>
+    <script src="js/utils/profileUtils.js"></script>
+    <script src="js/utils/formatUtils.js"></script>
+    <script src="js/utils/domUtils.js"></script>
+    <script src="js/services/walletConnection.js"></script>
+    <script src="js/services/contractConnection.js"></script>
+    <script src="js/controllers/pageController.js"></script>
+    <script src="js/siteShell.js"></script>
+  </body>
+</html>
