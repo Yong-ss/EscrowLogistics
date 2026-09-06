@@ -30,31 +30,53 @@ GitHub repository: [EscrowLogistics](https://github.com/Yong-ss/EscrowLogistics)
 
 ```text
 EscrowLogistics/
+├── .gitignore                    # Files that should not be committed
 ├── contracts/
-│   ├── EscrowLogistics.sol       # escrow, roles, milestones, payouts, and refunds
-│   └── Migrations.sol            # Truffle migration helper
-├── migrations/                   # deployment scripts
+│   ├── EscrowLogistics.sol        # escrow, roles, milestones, payouts, and refunds
+│   └── Migrations.sol             # Truffle migration helper contract
+├── migrations/
+│   ├── 1_initial_migration.js    # Deploys the Truffle Migrations contract
+│   └── 2_deploy_contracts.js     # Deploys the EscrowLogistics contract
 ├── src/
-│   ├── index.html                 # dashboard
-│   ├── agreements.html            # agreement list
-│   ├── agreement-details.html     # selected agreement details and history
-│   ├── create-agreement.html      # Shipper creates an agreement
+│   ├── agreement-details.html     # Shows one agreement's details and history
+│   ├── agreements.html            # Shows the connected wallet's agreements
 │   ├── carrier-jobs.html          # Carrier accepts jobs and submits milestones
+│   ├── create-agreement.html      # Shipper creates an agreement
 │   ├── fund.html                  # Shipper funds an accepted agreement
+│   ├── index.html                 # Main role-based dashboard
+│   ├── profile.html               # Browser-based profile information
+│   ├── refund.html                # Deadline refund action for the Shipper
+│   ├── register.html              # Wallet registration and role selection
 │   ├── verify.html                # Shipper verifies submitted milestones
-│   ├── refund.html                # deadline refund action
-│   ├── register.html              # wallet registration and role selection
-│   ├── profile.html               # local browser profile
-│   ├── partials/                  # shared header, sidebar, and footer
-│   ├── css/style.css              # shared styling
-│   └── js/
-│       ├── abi.js                 # ABI and deployed contract address
-│       ├── controllers/           # page-specific actions
-│       ├── services/              # wallet and contract connection
-│       └── utils/                 # shared formatting, error, milestone, and profile helpers
-├── server.js                      # Express static server on port 5000
-├── truffle-config.js              # local and Sepolia network settings
-└── package.json
+│   ├── css/
+│   │   └── style.css              # Shared layout, form, card, and page styling
+│   ├── js/
+│   │   ├── abi.js                 # Contract ABI and deployed contract address
+│   │   ├── siteShell.js           # Loads shared HTML partials and page shell setup
+│   │   ├── controllers/
+│   │   │   ├── agreementController.js # Agreement list, details, and history actions
+│   │   │   ├── carrierController.js   # Carrier jobs, acceptance, and submissions
+│   │   │   ├── pageController.js       # Role-based page access and page loading
+│   │   │   ├── profileController.js    # Profile form and avatar actions
+│   │   │   ├── registerController.js   # User role registration actions
+│   │   │   └── shipperController.js    # Agreement, funding, verification, and refund actions
+│   │   ├── services/
+│   │   │   ├── contractConnection.js  # Creates the Web3 smart contract connection
+│   │   │   └── walletConnection.js     # Connects MetaMask and tracks the wallet
+│   │   └── utils/
+│   │       ├── domUtils.js             # DOM updates and readable blockchain errors
+│   │       ├── formatUtils.js          # Formats roles, statuses, and blockchain events
+│   │       ├── milestoneUtils.js       # Builds and reads milestone form fields
+│   │       └── profileUtils.js         # Saves and loads browser profile data
+│   └── partials/
+│       ├── footer.html             # Shared page footer
+│       ├── header.html             # Shared page header and wallet area
+│       └── sidebar.html            # Shared role-based navigation sidebar
+├── package-lock.json               # Locked npm dependency versions
+├── package.json                    # Project scripts and npm dependencies
+├── README.md                       # Project description and setup instructions
+├── server.js                       # Express static server on port 5000
+└── truffle-config.js               # Ganache and Sepolia network settings
 ```
 
 ## Run the existing Sepolia deployment
