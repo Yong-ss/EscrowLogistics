@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>document.documentElement.classList.add('wallet-pending');</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Profile · Escrow Logistics</title>
@@ -18,20 +19,20 @@
         <section class="profile-layout">
           <div class="form-card profile-card">
             <div class="profile-identity">
-              <div class="profile-avatar-wrap">
-                <span id="profileInitials" class="profile-avatar">U</span>
-                <img id="profileAvatar" class="profile-avatar hidden" alt="Profile avatar" />
+              <div class="profile-avatar-container">
+                <div class="profile-avatar-wrap">
+                  <span id="profileInitials" class="profile-avatar">U</span>
+                  <img id="profileAvatar" class="profile-avatar hidden" alt="Profile avatar" />
+                </div>
+                <button id="removeAvatarButton" class="avatar-remove-badge hidden" type="button" onclick="removeProfileAvatar()" aria-label="Remove profile photo" title="Remove profile photo">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                </button>
               </div>
               <div>
                 <p class="eyebrow">LOCAL PROFILE</p>
                 <h2 id="profileDisplayName">Your profile</h2>
                 <span id="profileRole" class="status-pill">Not registered</span>
               </div>
-            </div>
-
-            <div class="profile-wallet">
-              <span>Wallet</span>
-              <strong id="profileAccount">Wallet not connected</strong>
             </div>
 
             <form id="profileForm" onsubmit="saveProfileForm(event)">
@@ -50,17 +51,18 @@
                 </div>
                 <div class="field full">
                   <label for="profileAvatarInput">Avatar (optional)</label>
-                  <input id="profileAvatarInput" type="file" accept="image/*" disabled />
-                  <small class="field-help">PNG, JPG, GIF, or WEBP up to 1 MB. Stored only in this browser.</small>
+                  <div id="avatarDropzone" class="avatar-dropzone">
+                    <span class="icon-chip green" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    </span>
+                    <strong>Drop your photo here, or browse</strong>
+                    <span id="avatarUploadHint">PNG, JPG, GIF, or WEBP up to 1 MB</span>
+                    <input id="profileAvatarInput" type="file" accept="image/png,image/jpeg,image/gif,image/webp" aria-describedby="avatarUploadHint avatarFileHelp" disabled />
+                  </div>
+                  <small class="field-help" id="avatarFileHelp">Stored only in this browser. Not published to blockchain.</small>
                 </div>
               </div>
               <div class="form-actions profile-actions">
-                <button id="removeAvatarButton" class="button button-light" type="button" onclick="removeProfileAvatar()" disabled>
-                  Remove photo
-                </button>
-                <button class="button button-outline" type="button" onclick="logoutWallet()" disabled>
-                  Log out
-                </button>
                 <button class="button button-dark" type="submit" disabled>
                   Save profile →
                 </button>
@@ -68,25 +70,58 @@
             </form>
           </div>
 
-          <aside class="empty-card profile-note">
+          <aside class="profile-side">
+            <section id="account-role" class="form-card profile-account">
+              <p class="eyebrow">YOUR ACCOUNT</p><h2>Account &amp; Role</h2>
+            <div class="field full wallet-address-field">
+              <label for="profileAccount">Wallet Address</label>
+              <div class="address-copy-bar">
+                <div class="address-hash-wrap" onclick="toggleAddressDisplay('profileAccount', 'addressHashBadge')" title="Click to toggle shortened hash / full address">
+                  <span class="wallet-hash-icon" aria-hidden="true">🔑</span>
+                  <code id="profileAccount" class="address-hash">Wallet not connected</code>
+                  <span id="addressHashBadge" class="address-hash-badge hidden">HASH</span>
+                </div>
+                <button type="button" id="copyAddressBtn" class="button-copy" onclick="copyWalletAddress()" title="Copy full wallet address" disabled>
+                  <span class="copy-icon" aria-hidden="true">📋</span>
+                  <span class="copy-label">Copy</span>
+                </button>
+              </div>
+              <small class="field-help" id="walletAddressHelp">Connected Web3 address formatted as on-chain hash.</small>
+            </div>
+
+
+              <div id="registerChoices" class="profile-role-choices">
+                <p class="form-help">Choose your role to start using your workspace.</p>
+                <button class="button button-dark" type="button" onclick="registerAsRole(1)" disabled>Register as Shipper</button>
+                <button class="button button-outline" type="button" onclick="registerAsRole(2)" disabled>Register as Carrier</button>
+              </div>
+              <div id="registeredState" class="registered-state hidden">
+                <span class="status-pill status-completed">Already registered</span>
+                <h3 id="registeredRole">Your account</h3>
+                <p class="form-help">Your role is stored on-chain and cannot be changed here.</p>
+              </div>
+            </section>
+            <section class="empty-card profile-note">
             <p class="eyebrow">HOW THIS WORKS</p>
             <h2>Wallet first</h2>
             <p>Your wallet is the dApp identity. The current Shipper or Carrier role is always read from the smart contract.</p>
             <p>Name, email, contact number, and the optional photo are local demo profile details. They are not public blockchain data.</p>
+            </section>
           </aside>
         </section>
         <div id="status" class="status-message"></div>
       </div>
       <div data-include="partials/footer.html"></div>
     </main>
-    <script src="js/utils/profileUtils.js"></script>
-    <script src="js/controllers/profileController.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
     <script src="js/abi.js"></script>
+    <script src="js/utils/profileUtils.js"></script>
     <script src="js/utils/formatUtils.js"></script>
     <script src="js/utils/domUtils.js"></script>
     <script src="js/services/walletConnection.js"></script>
     <script src="js/services/contractConnection.js"></script>
+    <script src="js/controllers/profileController.js"></script>
+    <script src="js/controllers/registerController.js"></script>
     <script src="js/controllers/pageController.js"></script>
     <script src="js/siteShell.js"></script>
   </body>

@@ -9,7 +9,7 @@ contract EscrowLogistics {
 
     // ---------- Types ----------
     enum Role { None, Shipper, Carrier }                    // 0, 1, 2
-    enum Status { Created, Funded, Completed, Refunded }    // agreement lifecycle
+    enum Status { Created, Funded, Completed, Refunded, Cancelled }    // agreement lifecycle
 
     struct Agreement {
         uint id;
@@ -50,6 +50,7 @@ contract EscrowLogistics {
     event MilestoneVerified(uint indexed id, uint milestoneNo, uint payout, address carrier);
     event AgreementCompleted(uint indexed id);
     event Refunded(uint indexed id, uint amount, address shipper);
+    event AgreementCancelled(uint indexed id, address indexed shipper);
 
     // ---------- Modifiers ----------
     // Reusable check: only the Shipper who owns this agreement may continue.
@@ -136,6 +137,16 @@ contract EscrowLogistics {
 
         a.carrierAccepted = true;
         emit AgreementAccepted(_id, msg.sender);
+    }
+
+    // Shipper cancels an agreement that has not been funded yet.
+    function cancelAgreement(uint _id) public onlyShipperOf(_id) {
+        require(_id > 0 && _id <= agreementCount, "Agreement does not exist");
+        Agreement storage a = agreements[_id];
+        require(a.status == Status.Created, "Cannot cancel once funded or finished");
+
+        a.status = Status.Cancelled;
+        emit AgreementCancelled(_id, msg.sender);
     }
 
     // ---------- 3. Funding (lock Ether into escrow) ----------
@@ -266,9 +277,9 @@ contract EscrowLogistics {
     // Calculates how much Ether is still locked in the agreement.
     function escrowBalance(uint _id) public view returns (uint) {
         Agreement memory a = agreements[_id];
-        // A refunded agreement has no funds left in escrow, even though the
+        // A refunded or cancelled agreement has no funds left in escrow, even though the
         // historical totalValue and amountReleased values remain readable.
-        if (a.status == Status.Refunded) return 0;
+        if (a.status == Status.Refunded || a.status == Status.Cancelled) return 0;
         return a.totalValue - a.amountReleased;
     }
 }

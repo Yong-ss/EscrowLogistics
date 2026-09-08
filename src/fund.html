@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>document.documentElement.classList.add('wallet-pending');</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Fund Escrow · Escrow Logistics</title>
@@ -21,8 +22,11 @@
             After you fund, the Ether stays locked until milestones are verified
             or a deadline refund is triggered. You cannot change the amount here.
           </p>
-          <input id="fundId" type="hidden" />
-          <div id="fundAgreementChoices" class="agreement-choices"></div>
+          <div class="field">
+            <label for="fundId">Select Agreement</label>
+            <input id="fundId" type="hidden" />
+            <div id="fundAgreementChoices" class="agreement-choices"></div>
+          </div>
           <div id="fundSummary" class="action-summary"></div>
           <div class="form-actions">
             <button class="button button-dark" onclick="fundAgreementEscrow()">

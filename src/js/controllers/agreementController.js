@@ -16,35 +16,109 @@ const getMyAgreementRecords = async () => {
   return records;
 };
 
+let cachedAgreementRecords = [];
+let currentFilter = "all";
+let currentSearchQuery = "";
+let currentSortOrder = "id_desc";
+
+// Filters and sorts the cached agreement records and updates the UI.
+const renderFilteredAgreements = () => {
+  const list = document.getElementById("agreementList");
+  const count = document.getElementById("agreementCount");
+  if (!list) return;
+
+  let filtered = [...cachedAgreementRecords];
+
+  // 1. Search filter (by name, ID, or participant address)
+  if (currentSearchQuery) {
+    const q = currentSearchQuery.toLowerCase();
+    filtered = filtered.filter(({ agreement }) =>
+      agreement.name.toLowerCase().includes(q) ||
+      String(agreement.id).includes(q) ||
+      agreement.carrier.toLowerCase().includes(q) ||
+      agreement.shipper.toLowerCase().includes(q)
+    );
+  }
+
+  // 2. Status filter
+  if (currentFilter === "pending") {
+    filtered = filtered.filter(({ agreement }) => Number(agreement.status) === 0 && !agreement.carrierAccepted);
+  } else if (currentFilter === "funded") {
+    filtered = filtered.filter(({ agreement }) => Number(agreement.status) === 1);
+  } else if (currentFilter === "completed") {
+    filtered = filtered.filter(({ agreement }) => Number(agreement.status) === 2);
+  } else if (currentFilter === "cancelled_refunded") {
+    filtered = filtered.filter(({ agreement }) => Number(agreement.status) === 3 || Number(agreement.status) === 4);
+  }
+
+  // 3. Sorting
+  filtered.sort((a, b) => {
+    if (currentSortOrder === "id_desc") return Number(b.agreement.id) - Number(a.agreement.id);
+    if (currentSortOrder === "id_asc") return Number(a.agreement.id) - Number(b.agreement.id);
+    if (currentSortOrder === "deadline_soon") return Number(a.agreement.deadline) - Number(b.agreement.deadline);
+    if (currentSortOrder === "val_high") {
+      return BigInt(b.agreement.declaredPayloadValue) > BigInt(a.agreement.declaredPayloadValue) ? 1 : -1;
+    }
+    if (currentSortOrder === "val_low") {
+      return BigInt(a.agreement.declaredPayloadValue) > BigInt(b.agreement.declaredPayloadValue) ? 1 : -1;
+    }
+    return 0;
+  });
+
+  if (count) {
+    count.textContent = filtered.length + (filtered.length === 1 ? " agreement" : " agreements");
+  }
+
+  if (!filtered.length) {
+    list.innerHTML = cachedAgreementRecords.length === 0
+      ? "<p class='choice-empty'>No agreements are linked to this wallet yet.</p>"
+      : "<p class='choice-empty'>No agreements match your filter or search criteria.</p>";
+    return;
+  }
+
+  list.innerHTML = filtered.map(({ agreement, role }) => {
+    const statusName = STATUS_NAMES[Number(agreement.status)] || "Unknown";
+    const acceptanceText = Number(agreement.status) === 0 && !agreement.carrierAccepted
+      ? "Waiting for Carrier"
+      : statusName;
+    return "<a class='agreement-card status-" + statusName.toLowerCase() + "' href='agreement-details.html?id=" + agreement.id + "'>" +
+      "<div class='agreement-card-top'><span class='agreement-id'>Agreement #" + agreement.id +
+      "</span><span class='status-pill status-" + statusName.toLowerCase() + "'>" + escapeHtmlForPage(acceptanceText) + "</span></div>" +
+      "<h3>" + escapeHtmlForPage(agreement.name) + "</h3>" +
+      "<div class='agreement-card-meta'><span>Role: " + escapeHtmlForPage(role) + "</span><span>" +
+      agreement.milestonesDone + " / " + agreement.milestoneCount + " milestones</span></div>" +
+      "<div class='agreement-card-bottom'><span>" +
+      web3Client.utils.fromWei(agreement.declaredPayloadValue, "ether") + " ETH escrow</span>" +
+      "<span class='card-arrow'>View details →</span></div></a>";
+  }).join("");
+};
+
+// Handlers for search input, status filter pills, and sort dropdown.
+const handleAgreementSearch = (value) => {
+  currentSearchQuery = (value || "").trim();
+  renderFilteredAgreements();
+};
+
+const handleAgreementSort = (value) => {
+  currentSortOrder = value || "id_desc";
+  renderFilteredAgreements();
+};
+
+const handleAgreementFilter = (filterKey) => {
+  currentFilter = filterKey || "all";
+  document.querySelectorAll("#statusFilterPills .filter-pill").forEach((pill) => {
+    pill.classList.toggle("active", pill.dataset.filter === currentFilter);
+  });
+  renderFilteredAgreements();
+};
+
 // Shows only this wallet's agreements as cards with a normal details link.
 const loadMyAgreements = async () => {
   try {
     const records = await getMyAgreementRecords();
-    const list = document.getElementById("agreementList");
-    const count = document.getElementById("agreementCount");
-    if (!records || !list) return;
-
-    if (count) count.textContent = records.length + (records.length === 1 ? " agreement" : " agreements");
-    if (!records.length) {
-      list.innerHTML = "<p class='choice-empty'>No agreements are linked to this wallet yet.</p>";
-      return;
-    }
-
-    list.innerHTML = records.map(({ agreement, role }) => {
-      const statusName = STATUS_NAMES[Number(agreement.status)] || "Unknown";
-      const acceptanceText = Number(agreement.status) === 0 && !agreement.carrierAccepted
-        ? "Waiting for Carrier"
-        : statusName;
-      return "<a class='agreement-card' href='agreement-details.html?id=" + agreement.id + "'>" +
-        "<div class='agreement-card-top'><span class='agreement-id'>Agreement #" + agreement.id +
-        "</span><span class='status-pill'>" + escapeHtmlForPage(acceptanceText) + "</span></div>" +
-        "<h3>" + escapeHtmlForPage(agreement.name) + "</h3>" +
-        "<div class='agreement-card-meta'><span>" + escapeHtmlForPage(role) + "</span><span>" +
-        agreement.milestonesDone + " / " + agreement.milestoneCount + " milestones</span></div>" +
-        "<div class='agreement-card-bottom'><span>" +
-        web3Client.utils.fromWei(agreement.declaredPayloadValue, "ether") + " ETH escrow</span>" +
-        "<span class='card-arrow'>View details →</span></div></a>";
-    }).join("");
+    if (!records) return;
+    cachedAgreementRecords = records;
+    renderFilteredAgreements();
   } catch (error) {
     showFriendlyError(error, "Loading your agreements");
   }
@@ -62,14 +136,14 @@ const loadSelectedAgreementDetails = async () => {
   try {
     const agreementId = getAgreementIdFromDetailsLink();
     if (!agreementId) {
-      showStatusMessage("This agreement link is incomplete. Go back and choose an agreement.", "error");
+      showStatusMessage("This agreement link is incomplete. Go back and choose an agreement.", "warning");
       return;
     }
 
     const records = await getMyAgreementRecords();
     const selectedRecord = records && records.find(({ agreement }) => String(agreement.id) === String(agreementId));
     if (!selectedRecord) {
-      showStatusMessage("This agreement is not linked to the current wallet.", "error");
+      showStatusMessage("This agreement is not linked to the current wallet.", "warning");
       return;
     }
 
@@ -88,9 +162,11 @@ const loadAgreementDetails = async (agreementId, knownAgreement = null) => {
   const escrowBalanceWei = await escrowContract.methods.escrowBalance(agreementId).call();
   const milestoneRows = [];
 
+  const milestones = [];
   // Read each step so the page can show a simple progress timeline.
   for (let index = 0; index < Number(agreementRecord.milestoneCount); index++) {
     const milestone = await escrowContract.methods.getMilestone(agreementId, index).call();
+    milestones.push(milestone);
     const complete = index < Number(agreementRecord.milestonesDone);
     milestoneRows.push(
       "<div class='milestone-row " + (complete ? "complete" : "") + "'>" +
@@ -119,13 +195,67 @@ const loadAgreementDetails = async (agreementId, knownAgreement = null) => {
   const title = document.getElementById("agreementTitle");
   const status = document.getElementById("agreementStatus");
   if (title) title.textContent = agreementRecord.name;
-  if (status) status.textContent = STATUS_NAMES[Number(agreementRecord.status)] || "Unknown";
+  if (status) {
+    const statusName = STATUS_NAMES[Number(agreementRecord.status)] || "Unknown";
+    status.textContent = statusName;
+    status.className = "status-pill status-" + statusName.toLowerCase();
+  }
+
+  // Shipper cancellation button for unfunded drafts
+  const actionButtons = document.getElementById("agreementActionButtons");
+  if (actionButtons) {
+    const isShipper = connectedAccount && connectedAccount.toLowerCase() === agreementRecord.shipper.toLowerCase();
+    const isUnfunded = Number(agreementRecord.status) === 0;
+    if (isShipper && isUnfunded) {
+      actionButtons.innerHTML =
+        "<div class='cancellation-banner'>" +
+        "<span><strong>Unfunded draft:</strong> This agreement has not received escrow funds. You can cancel it if not needed.</span>" +
+        "<button type='button' class='button button-danger' onclick=\"cancelSelectedAgreement('" + agreementRecord.id + "')\">✕ Cancel agreement</button>" +
+        "</div>";
+    } else {
+      actionButtons.innerHTML = "";
+    }
+  }
 
   document.getElementById("agreementDetails").innerHTML =
-    "<div class='detail-grid'>" + detailFields.map(([label, value]) =>
-      "<div class='detail-item'><span>" + label + "</span><strong>" + escapeHtmlForPage(value) + "</strong></div>"
-    ).join("") + "</div>" +
-    "<div class='milestone-list'><h3>Milestone plan</h3>" + milestoneRows.join("") + "</div>";
+    "<div class='detail-grid'>" + detailFields.map(([label, value]) => {
+      let valueHtml = escapeHtmlForPage(value);
+      if ((label === "Shipper" || label === "Carrier") && typeof value === "string" && value.startsWith("0x")) {
+        valueHtml = "<span class='detail-address-row'>" +
+          "<code class='address-code' title='" + escapeHtmlForPage(value) + "'>" + (typeof shortenAddress === "function" ? shortenAddress(value) : value) + "</code>" +
+          "<button type='button' class='button-mini-copy' onclick=\"copyTextToClipboard('" + escapeHtmlForPage(value) + "', '" + label + " address', this)\" title='Copy full " + label + " address'>📋 Copy</button>" +
+          "</span>";
+      }
+      return "<div class='detail-item'><span>" + label + "</span><strong>" + valueHtml + "</strong></div>";
+    }).join("") + "</div>" +
+    "<div id='detailsMilestoneTracker'></div>" +
+    "<div class='milestone-list'><h3>Milestone breakdown</h3>" + milestoneRows.join("") + "</div>";
+
+  // Render the animated step tracker
+  renderMilestoneStepTracker("detailsMilestoneTracker", agreementRecord, milestones, { role: "viewer" });
+};
+
+// Cancels an unfunded agreement on-chain.
+const cancelSelectedAgreement = async (agreementId) => {
+  if (!confirm("Are you sure you want to cancel Agreement #" + agreementId + "? This will discard this draft.")) {
+    return;
+  }
+  try {
+    showStatusMessage("Submitting cancellation to blockchain. Confirm in MetaMask...");
+    await sendWithEstimatedGas(
+      escrowContract.methods.cancelAgreement(agreementId),
+      { from: connectedAccount }
+    );
+    showStatusMessage("Agreement #" + agreementId + " has been cancelled.", "success");
+    await loadSelectedAgreementDetails();
+  } catch (error) {
+    showFriendlyError(error, "Cancelling the agreement");
+  }
+};
+
+// Triggers the browser print dialog with the styled Bill of Lading layout.
+const printBillOfLading = () => {
+  window.print();
 };
 
 // Builds a readable history timeline for the selected agreement only.

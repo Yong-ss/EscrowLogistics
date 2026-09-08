@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>document.documentElement.classList.add('wallet-pending');</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Dashboard · Escrow Logistics</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body data-page="dashboard" data-title="Dashboard">
+    <div data-include="partials/sidebar.html"></div>
+    <main class="app-shell">
+      <div data-include="partials/header.html"></div>
+      <div class="page-content">
+        <section class="hero-card">
+          <div>
+            <p class="eyebrow light">DECENTRALIZED ESCROW</p>
+            <h2>
+              Move every delivery forward
+              <br />
+              with confidence.
+            </h2>
+            <p class="hero-copy">
+              Create milestone-based agreements, lock funds securely, and release
+              payments as work is verified.
+            </p>
+            <a
+              class="button button-light"
+              href="create-agreement.html"
+              data-role="shipper"
+            >
+              Create an agreement
+              <span>→</span>
+            </a>
+            <a
+              class="button button-light"
+              href="carrier-jobs.html"
+              data-role="carrier"
+            >
+              View my jobs
+              <span>→</span>
+            </a>
+          </div>
+          <div class="hero-orbit">
+            <div class="orbit-center" role="img" aria-label="Escrow Logistics"><svg class="brand-symbol" viewBox="97 399 1052 419" aria-hidden="true" focusable="false"><image href="assets/images/el_logo.png" width="1254" height="1254" /></svg></div>
+            <span class="orbit-dot dot-one"></span>
+            <span class="orbit-dot dot-two"></span>
+          </div>
+        </section>
+        <section class="section-heading">
+          <div>
+            <p class="eyebrow">QUICK ACCESS</p>
+            <h2>What would you like to do?</h2>
+          </div>
+        </section>
+        <section class="action-grid">
+          <a class="action-card" href="create-agreement.html" data-role="shipper">
+            <span class="icon-chip green">＋</span>
+            <h3>Create agreement</h3>
+            <p>Set a carrier, milestone plan, value, and deadline.</p>
+            <span class="card-arrow">→</span>
+          </a>
+          <a class="action-card" href="fund.html" data-role="shipper">
+            <span class="icon-chip blue">↗</span>
+            <h3>Fund escrow</h3>
+            <p>Lock the declared payload value into the agreement.</p>
+            <span class="card-arrow">→</span>
+          </a>
+          <a class="action-card" href="agreements.html">
+            <span class="icon-chip orange">▤</span>
+            <h3>View agreements</h3>
+            <p>Review status, payouts, and carrier assignments.</p>
+            <span class="card-arrow">→</span>
+          </a>
+        </section>
+        <section class="connect-strip">
+          <div class="connect-strip-left">
+            <span class="status-dot"></span>
+            <div class="connect-strip-identity">
+              <span class="connect-strip-label">Wallet Address</span>
+              <div class="address-copy-bar connect-strip-address-bar">
+                <div class="address-hash-wrap" onclick="toggleAddressDisplay('account', 'indexAddressHashBadge')" title="Click to toggle shortened hash / full address">
+                  <span class="wallet-hash-icon" aria-hidden="true">🔑</span>
+                  <code id="account" class="address-hash">Wallet not connected</code>
+                  <span id="indexAddressHashBadge" class="address-hash-badge hidden">HASH</span>
+                </div>
+                <button type="button" id="copyAccountBtn" class="button-copy" onclick="copyConnectedAccount(this)" title="Copy wallet address" disabled>
+                  <span class="copy-icon" aria-hidden="true">📋</span>
+                  <span class="copy-label">Copy</span>
+                </button>
+              </div>
+              <p class="connect-strip-help">Connect MetaMask to view your on-chain workspace.</p>
+            </div>
+          </div>
+          <div class="connect-strip-right">
+            <a href="profile.html#account-role" class="button button-outline connect-strip-btn">Set up your role →</a>
+          </div>
+        </section>
+        <div id="status" class="status-message"></div>
+      </div>
+      <div data-include="partials/footer.html"></div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <script src="js/abi.js"></script>
+    <script src="js/utils/profileUtils.js"></script>
+    <script src="js/utils/formatUtils.js"></script>
+    <script src="js/utils/domUtils.js"></script>
+    <script src="js/services/walletConnection.js"></script>
+    <script src="js/services/contractConnection.js"></script>
+    <script src="js/controllers/pageController.js"></script>
+    <script src="js/siteShell.js"></script>
+  </body>
+</html>

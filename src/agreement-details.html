@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>document.documentElement.classList.add('wallet-pending');</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Agreement details · Escrow Logistics</title>
@@ -20,8 +21,14 @@
               <p class="eyebrow">AGREEMENT DETAILS</p>
               <h2 id="agreementTitle">Loading agreement...</h2>
             </div>
-            <span id="agreementStatus" class="status-pill"></span>
+            <div class="detail-heading-actions">
+              <span id="agreementStatus" class="status-pill"></span>
+              <button type="button" class="button button-outline" onclick="printBillOfLading()">
+                🖨️ Print Bill of Lading (PDF)
+              </button>
+            </div>
           </div>
+          <div id="agreementActionButtons" class="detail-actions-bar"></div>
           <div id="agreementDetails"></div>
         </section>
 

@@ -1,98 +1,61 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Dashboard · Escrow Logistics</title>
-    <link rel="stylesheet" href="css/style.css" />
-  </head>
-
-  <body data-page="dashboard" data-title="Dashboard">
-    <div data-include="partials/sidebar.html"></div>
-    <main class="app-shell">
-      <div data-include="partials/header.html"></div>
-      <section class="hero-card">
-        <div>
-          <p class="eyebrow light">DECENTRALIZED ESCROW</p>
-          <h2>
-            Move every delivery forward
-            <br />
-            with confidence.
-          </h2>
-          <p class="hero-copy">
-            Create milestone-based agreements, lock funds securely, and release
-            payments as work is verified.
-          </p>
-          <a
-            class="button button-light"
-            href="create-agreement.html"
-            data-role="shipper"
-          >
-            Create an agreement
-            <span>→</span>
-          </a>
-          <a
-            class="button button-light"
-            href="carrier-jobs.html"
-            data-role="carrier"
-          >
-            View my jobs
-            <span>→</span>
-          </a>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Connect shippers and carriers through milestone-based agreements, escrow funding, and verified payments with Escrow Logistics." />
+  <title>Escrow Logistics · Every milestone matters</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/home.css" />
+  <script defer src="js/home.js"></script>
+  <script defer src="js/homeMotion.js"></script>
+  <script type="module" src="js/truckScene.js"></script>
+</head>
+<body data-page="home">
+  <a class="home-skip" href="#overview">Skip to overview</a>
+  <header class="home-header">
+    <div class="topbar">
+      <a class="brand" href="index.html"><span class="brand-mark"><svg class="brand-symbol" viewBox="97 399 1052 419" aria-hidden="true" focusable="false"><image href="assets/images/el_logo.png" width="1254" height="1254" /></svg></span><span>Escrow <span class="muted">Logistics</span></span></a>
+      <nav aria-label="Main navigation"><a href="#overview">Overview</a><a href="#how-it-works">How it works</a></nav>
+      <button class="button button-dark" data-connect>Connect wallet <span aria-hidden="true">↗</span></button>
+    </div>
+  </header>
+  <main class="home-main">
+    <section class="home-journey" id="journey" aria-labelledby="home-title">
+      <div class="home-stage">
+        <div class="home-intro">
+          <p class="eyebrow">DECENTRALIZED ESCROW · CONNECTED LOGISTICS</p>
+          <h1 id="home-title">Move with confidence.<br /><span>Pay by progress.</span></h1>
+          <p>One shared journey for shippers and carriers.<br />Agree on the milestones. Fund the escrow. Move forward together.</p>
+          <div class="home-actions"><button class="button button-primary" data-connect>Enter your workspace <span aria-hidden="true">↗</span></button><a class="button button-outline" href="#how-it-works">See how it works ↓</a></div>
         </div>
-        <div class="hero-orbit">
-          <div class="orbit-center">EL</div>
-          <span class="orbit-dot dot-one"></span>
-          <span class="orbit-dot dot-two"></span>
+        <div class="truck-stage" id="truckStage" role="img" aria-label="A green Escrow Logistics truck turns from a front view to a side view and drives away as you scroll.">
+          <div class="truck-fallback" id="truckFallback"><span class="brand-mark"><svg class="brand-symbol" viewBox="97 399 1052 419" aria-hidden="true" focusable="false"><image href="assets/images/el_logo.png" width="1254" height="1254" /></svg></span><strong>Every milestone moves you forward.</strong></div>
         </div>
-      </section>
-      <section class="section-heading">
-        <div>
-          <p class="eyebrow">QUICK ACCESS</p>
-          <h2>What would you like to do?</h2>
-        </div>
-      </section>
-      <section class="action-grid">
-        <a class="action-card" href="create-agreement.html" data-role="shipper">
-          <span class="icon-chip green">＋</span>
-          <h3>Create agreement</h3>
-          <p>Set a carrier, milestone plan, value, and deadline.</p>
-          <span class="card-arrow">→</span>
-        </a>
-        <a class="action-card" href="fund.html" data-role="shipper">
-          <span class="icon-chip blue">↗</span>
-          <h3>Fund escrow</h3>
-          <p>Lock the declared payload value into the agreement.</p>
-          <span class="card-arrow">→</span>
-        </a>
-        <a class="action-card" href="agreements.html">
-          <span class="icon-chip orange">▤</span>
-          <h3>View agreements</h3>
-          <p>Review status, payouts, and carrier assignments.</p>
-          <span class="card-arrow">→</span>
-        </a>
-      </section>
-      <section class="connect-strip">
-        <div>
-          <span class="status-dot"></span>
-          <strong id="account">Wallet not connected</strong>
-          <p>Connect MetaMask to view your on-chain workspace.</p>
-        </div>
-        <a href="register.html" class="text-link">Set up your role →</a>
-      </section>
-      <div id="status" class="status-message"></div>
-      <div data-include="partials/footer.html"></div>
-    </main>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
-    <script src="js/abi.js"></script>
-    <script src="js/utils/profileUtils.js"></script>
-    <script src="js/utils/formatUtils.js"></script>
-    <script src="js/utils/domUtils.js"></script>
-    <script src="js/services/walletConnection.js"></script>
-    <script src="js/services/contractConnection.js"></script>
-    <script src="js/controllers/pageController.js"></script>
-    <script src="js/siteShell.js"></script>
-  </body>
+        <div class="journey-caption"><span class="eyebrow" id="journeyLabel">01 / AGREE ON THE JOURNEY</span><span class="journey-scroll">Scroll to move forward ↓</span></div>
+        <div class="journey-track"><span id="journeyProgress"></span></div>
+      </div>
+    </section>
+    <section id="overview" class="home-section">
+      <div class="section-heading"><p class="eyebrow">THE ESCROW LOGISTICS OVERVIEW</p><h2>Clear agreements. Visible progress.</h2><p class="home-copy">Bring delivery operations and payments into one workspace, with a shared record of what comes next.</p></div>
+      <div class="action-grid">
+        <article class="action-card"><span class="icon-chip green">▤</span><h3>A plan both sides can follow</h3><p>Define the carrier, delivery milestones, agreement value, and deadline before the journey begins.</p></article>
+        <article class="action-card"><span class="icon-chip blue">↗</span><h3>Funds ready for the road</h3><p>Shippers fund the agreement in escrow, with payments tied to the agreed milestone plan.</p></article>
+        <article class="action-card"><span class="icon-chip orange">✓</span><h3>Progress that unlocks payment</h3><p>Carriers submit milestone progress. Shippers verify it to release the corresponding payment.</p></article>
+      </div>
+    </section>
+    <section id="how-it-works" class="home-section home-workflow">
+      <div class="section-heading"><p class="eyebrow">FROM AGREEMENT TO ARRIVAL</p><h2>One journey. Four clear steps.</h2><p class="home-copy">Your wallet connects you to your workspace.<br />Your role gives you the tools to get moving.</p><button class="button button-dark" data-connect>Connect wallet ↗</button></div>
+      <ol class="home-steps">
+        <li><span>01</span><div><h3>Connect & choose your role</h3><p>Connect MetaMask, then register as a shipper or carrier.</p></div></li>
+        <li><span>02</span><div><h3>Agree & fund</h3><p>The shipper creates the agreement and deposits its value into escrow.</p></div></li>
+        <li><span>03</span><div><h3>Deliver & verify</h3><p>The carrier reports progress for the shipper to review at each milestone.</p></div></li>
+        <li><span>04</span><div><h3>Release & keep track</h3><p>Release verified payments and review the agreement history in your dashboard.</p></div></li>
+      </ol>
+    </section>
+    <section class="hero-card home-cta"><div><p class="eyebrow light">YOUR NEXT DELIVERY STARTS HERE</p><h2>Ready to move forward?</h2><p class="hero-copy">Connect your wallet and bring your next agreement into view.</p></div><button class="button button-light" data-connect>Connect wallet ↗</button></section>
+  </main>
+  <footer class="home-footer"><span class="footer-brand"><svg class="brand-symbol" viewBox="97 399 1052 419" aria-hidden="true" focusable="false"><image href="assets/images/el_logo.png" width="1254" height="1254" /></svg><span>Escrow Logistics</span></span><span>Built around every milestone.</span><a href="#home-title">Back to top ↑</a></footer>
+  <p id="homeStatus" role="status" aria-live="polite" hidden></p>
+</body>
 </html>
-
-

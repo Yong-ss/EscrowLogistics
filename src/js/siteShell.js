@@ -3,6 +3,22 @@ const toggleSidebar = () => document.body.classList.toggle("sidebar-open");
 
 // Loads the same sidebar, header, and footer into every page.
 const loadSharedPartials = async () => {
+  // Check wallet permission before revealing any workspace content.
+  document.body.style.visibility = "hidden";
+  let accounts = [];
+  try {
+    if (window.ethereum && localStorage.getItem("escrowLoggedOut") !== "true") {
+      accounts = await window.ethereum.request({ method: "eth_accounts" });
+    }
+  } catch (error) {
+    console.warn("Wallet session unavailable:", error);
+  }
+  if (!accounts.length) {
+    window.location.replace("index.html");
+    return;
+  }
+  document.body.style.visibility = "";
+  document.documentElement.classList.remove("wallet-pending");
   const placeholders = document.querySelectorAll("[data-include]");
 
   await Promise.all(

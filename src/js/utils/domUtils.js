@@ -1,11 +1,162 @@
 // Small helpers for updating the page - no contract logic here.
 
-// Shows a short message that normal users can understand.
-function showStatusMessage(message, type = "success") {
-  const status = document.getElementById("status");
-  if (!status) return;
-  status.textContent = message;
-  status.className = "status-message " + type;
+// Configuration for notification types: light blue, green, red, yellow, orange
+const NOTIFICATION_THEMES = {
+  info: {
+    label: "Information",
+    icon: "ℹ",
+    toastClass: "toast-info",
+    statusClass: "info",
+  },
+  success: {
+    label: "Success",
+    icon: "✓",
+    toastClass: "toast-success",
+    statusClass: "success",
+  },
+  error: {
+    label: "Error",
+    icon: "✕",
+    toastClass: "toast-error",
+    statusClass: "error",
+  },
+  warning: {
+    label: "Warning",
+    icon: "⚠",
+    toastClass: "toast-warning",
+    statusClass: "warning",
+  },
+  required: {
+    label: "Required",
+    icon: "✱",
+    toastClass: "toast-required",
+    statusClass: "required",
+  },
+};
+
+// Gets or injects the floating toast container with high proximity to user view
+function getOrCreateToastContainer() {
+  let container = document.getElementById("toastContainer");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toastContainer";
+    container.className = "toast-container";
+    container.setAttribute("aria-live", "polite");
+    document.body.appendChild(container);
+  }
+  return container;
+}
+
+// Shows a modern notification alert (floating toast + formatted inline status)
+function showStatusMessage(message, rawType = "info") {
+  if (!message) return;
+
+  // Normalize type string
+  let type = String(rawType || "info").toLowerCase().trim();
+  if (type === "information") type = "info";
+  if (type === "warn") type = "warning";
+  if (!NOTIFICATION_THEMES[type]) type = "info";
+
+  const theme = NOTIFICATION_THEMES[type];
+  const safeText = typeof escapeHtmlForPage === "function" ? escapeHtmlForPage(message) : message;
+
+  // 1. Update inline #status element if present on the page
+  const statusEl = document.getElementById("status");
+  if (statusEl) {
+    if (statusEl._dismissTimer) clearTimeout(statusEl._dismissTimer);
+    statusEl.classList.remove("status-fade-out");
+    statusEl.className = "status-message " + theme.statusClass;
+    statusEl.innerHTML = `
+      <span class="status-icon" aria-hidden="true">${theme.icon}</span>
+      <div class="status-content">
+        <strong class="status-label">${theme.label}:</strong>
+        <span class="status-text">${safeText}</span>
+      </div>
+      <button type="button" class="status-close-btn" aria-label="Close notification">✕</button>
+    `;
+
+    // Manual close button
+    const statusCloseBtn = statusEl.querySelector(".status-close-btn");
+    if (statusCloseBtn) {
+      statusCloseBtn.addEventListener("click", () => dismissStatusElement(statusEl));
+    }
+
+    // Auto dismiss after 4.5 seconds
+    statusEl._dismissTimer = setTimeout(() => {
+      dismissStatusElement(statusEl);
+    }, 4500);
+
+    // Pause timer on hover, resume on mouse leave
+    statusEl.onmouseenter = () => {
+      if (statusEl._dismissTimer) clearTimeout(statusEl._dismissTimer);
+    };
+    statusEl.onmouseleave = () => {
+      statusEl._dismissTimer = setTimeout(() => {
+        dismissStatusElement(statusEl);
+      }, 2000);
+    };
+  }
+
+  // 2. Spawn modern floating toast with optimal visual proximity
+  const container = getOrCreateToastContainer();
+
+  // Limit stacked toasts to 4
+  while (container.children.length >= 4) {
+    container.firstElementChild.remove();
+  }
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${theme.toastClass} toast-enter`;
+  toast.innerHTML = `
+    <span class="toast-indicator"></span>
+    <span class="toast-icon-wrap" aria-hidden="true">${theme.icon}</span>
+    <div class="toast-body">
+      <div class="toast-label">${theme.label}</div>
+      <div class="toast-text">${safeText}</div>
+    </div>
+    <button type="button" class="toast-close-btn" aria-label="Close notification">✕</button>
+  `;
+
+  // Manual dismiss
+  const closeBtn = toast.querySelector(".toast-close-btn");
+  if (closeBtn && typeof closeBtn.addEventListener === "function") {
+    closeBtn.addEventListener("click", () => dismissToast(toast));
+  }
+
+  container.appendChild(toast);
+
+  // Auto dismiss after 4.5 seconds
+  let dismissTimer = setTimeout(() => dismissToast(toast), 4500);
+
+  // Pause timer on hover
+  toast.addEventListener("mouseenter", () => clearTimeout(dismissTimer));
+  toast.addEventListener("mouseleave", () => {
+    dismissTimer = setTimeout(() => dismissToast(toast), 2500);
+  });
+}
+
+// Dismisses the inline status banner with a smooth fade-out
+function dismissStatusElement(statusEl) {
+  if (!statusEl) return;
+  if (statusEl._dismissTimer) {
+    clearTimeout(statusEl._dismissTimer);
+    statusEl._dismissTimer = null;
+  }
+  statusEl.classList.add("status-fade-out");
+  setTimeout(() => {
+    statusEl.innerHTML = "";
+    statusEl.className = "status-message";
+    statusEl.classList.remove("status-fade-out");
+  }, 250);
+}
+
+function dismissToast(toast) {
+  if (!toast || toast.classList.contains("toast-exit")) return;
+  toast.classList.remove("toast-enter");
+  toast.classList.add("toast-exit");
+  setTimeout(() => {
+    if (toast && toast.parentNode) toast.remove();
+  }, 250);
 }
 
 // Estimates the real gas needed before sending, so public RPC nodes do not reject a huge default limit.
@@ -217,4 +368,239 @@ function showPanel(panelId) {
 function hidePanel(panelId) {
   const panel = document.getElementById(panelId);
   if (panel) panel.classList.add("hidden");
+}
+
+// Renders an animated, interactive Milestone Step Progression Tracker with Focus Card
+function renderMilestoneStepTracker(containerOrId, agreementRecord, milestones, options = {}) {
+  const container = typeof containerOrId === "string" ? document.getElementById(containerOrId) : containerOrId;
+  if (!container) return;
+
+  const role = options.role || "viewer"; // "carrier" | "shipper" | "viewer"
+  const totalCount = Number(agreementRecord.milestoneCount || (milestones ? milestones.length : 0));
+  if (!totalCount) {
+    container.innerHTML = "";
+    return;
+  }
+
+  const doneCount = Number(agreementRecord.milestonesDone || 0);
+  const allCompleted = doneCount >= totalCount;
+
+  const escape = (str) => typeof escapeHtmlForPage === "function" ? escapeHtmlForPage(str) : (str || "");
+
+  // Build steps HTML
+  let trackHtml = "";
+  for (let i = 0; i < totalCount; i++) {
+    const m = (milestones && milestones[i]) || {};
+    const isComplete = i < doneCount;
+    const isActive = !allCompleted && i === doneCount;
+
+    let stepClass = "upcoming";
+    let nodeContent = String(i + 1);
+    let statusText = "Pending";
+
+    if (isComplete) {
+      stepClass = "complete";
+      nodeContent = "✓";
+      statusText = "Verified";
+    } else if (isActive) {
+      stepClass = "active";
+      nodeContent = String(i + 1);
+      statusText = m.submitted ? "Review" : "In Progress";
+    }
+
+    trackHtml += `
+      <div class="stepper-step ${stepClass}">
+        <div class="stepper-node">${nodeContent}</div>
+        <div class="stepper-step-labels">
+          <span class="stepper-step-name">${escape(m.name || ("Milestone " + (i + 1)))}</span>
+          <span class="stepper-step-share">${m.payoutPercentage || 0}% · ${statusText}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // Build Focus Card HTML
+  let focusCardHtml = "";
+  if (allCompleted) {
+    focusCardHtml = `
+      <div class="stepper-focus-card">
+        <div class="focus-card-header">
+          <h3 class="focus-card-title">🎉 All Milestones Completed & Verified!</h3>
+          <span class="focus-card-payout">100% Escrow Released</span>
+        </div>
+        <p class="focus-card-desc">Every milestone in this agreement has been successfully submitted and verified. All escrow funds have been released to the Carrier.</p>
+      </div>
+    `;
+  } else {
+    const activeMilestone = (milestones && milestones[doneCount]) || {};
+    let payoutEth = "0";
+    try {
+      if (typeof web3Client !== "undefined" && web3Client.utils) {
+        const totalWei = BigInt(agreementRecord.declaredPayloadValue || agreementRecord.totalValue || "0");
+        const share = BigInt(activeMilestone.payoutPercentage || 0);
+        const payoutWei = (totalWei * share) / 100n;
+        payoutEth = web3Client.utils.fromWei(payoutWei.toString(), "ether");
+      }
+    } catch (e) {
+      payoutEth = "0";
+    }
+
+    let statusCalloutHtml = "";
+    if (role === "carrier") {
+      if (activeMilestone.submitted) {
+        statusCalloutHtml = `
+          <div class="focus-card-note-box">
+            <div class="focus-card-note-label">
+              <span>✓ Your Submitted Completion Note</span>
+            </div>
+            <p class="focus-card-note-text">"${escape(activeMilestone.submissionNote)}"</p>
+          </div>
+          <div class="focus-card-status-callout submitted">
+            <span>⏳ Submitted to blockchain — Waiting for the Shipper to verify this milestone and release ${payoutEth} ETH.</span>
+          </div>
+        `;
+      } else {
+        statusCalloutHtml = `
+          <div class="focus-card-status-callout pending">
+            <span>📝 Ready for completion report — Fill in the note below and submit to request Shipper verification.</span>
+          </div>
+        `;
+      }
+    } else if (role === "shipper") {
+      if (activeMilestone.submitted) {
+        statusCalloutHtml = `
+          <div class="focus-card-note-box">
+            <div class="focus-card-note-label">
+              <span>📋 Carrier Completion Note</span>
+            </div>
+            <p class="focus-card-note-text">"${escape(activeMilestone.submissionNote)}"</p>
+          </div>
+          <div class="focus-card-status-callout submitted">
+            <span>🔔 Carrier has submitted this milestone! Review their note above and click "Verify and release" below to release ${payoutEth} ETH.</span>
+          </div>
+        `;
+      } else {
+        statusCalloutHtml = `
+          <div class="focus-card-status-callout pending">
+            <span>⏳ Awaiting Carrier submission — The Carrier has not submitted a completion note for this milestone yet.</span>
+          </div>
+        `;
+      }
+    } else {
+      // Viewer
+      if (activeMilestone.submitted) {
+        statusCalloutHtml = `
+          <div class="focus-card-note-box">
+            <div class="focus-card-note-label">
+              <span>Carrier Note</span>
+            </div>
+            <p class="focus-card-note-text">"${escape(activeMilestone.submissionNote)}"</p>
+          </div>
+          <div class="focus-card-status-callout submitted">
+            <span>Submitted — Waiting for Shipper review.</span>
+          </div>
+        `;
+      } else {
+        statusCalloutHtml = `
+          <div class="focus-card-status-callout pending">
+            <span>Pending carrier completion.</span>
+          </div>
+        `;
+      }
+    }
+
+    focusCardHtml = `
+      <div class="stepper-focus-card">
+        <div class="focus-card-header">
+          <h3 class="focus-card-title">Step ${doneCount + 1} of ${totalCount}: ${escape(activeMilestone.name || ("Milestone " + (doneCount + 1)))}</h3>
+          <span class="focus-card-payout">💰 Payout: ${activeMilestone.payoutPercentage || 0}% (${payoutEth} ETH)</span>
+        </div>
+        <p class="focus-card-desc">${escape(activeMilestone.description || "No description provided.")}</p>
+        ${statusCalloutHtml}
+      </div>
+    `;
+  }
+
+  const badgeText = allCompleted
+    ? "All Steps Complete ✓"
+    : `Active: Step ${doneCount + 1} of ${totalCount}`;
+
+  container.innerHTML = `
+    <div class="milestone-stepper-wrap">
+      <div class="stepper-header-strip">
+        <div class="stepper-title-area">
+          <h4 class="stepper-heading">Milestone Progression Tracker</h4>
+          <span class="stepper-status-badge">${badgeText}</span>
+        </div>
+      </div>
+      <div class="stepper-track">
+        ${trackHtml}
+      </div>
+      ${focusCardHtml}
+    </div>
+  `;
+}
+
+// Copies text to clipboard with instant visual feedback and a toast notification.
+async function copyTextToClipboard(text, label = "Wallet address", buttonElement = null) {
+  if (!text) {
+    showStatusMessage("No text available to copy.", "warning");
+    return false;
+  }
+
+  let success = false;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      success = true;
+    } else {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+      textarea.setAttribute("readonly", "");
+      document.body.appendChild(textarea);
+      textarea.select();
+      success = document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+  } catch (err) {
+    console.warn("Clipboard API failed, trying execCommand fallback:", err);
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+      textarea.setAttribute("readonly", "");
+      document.body.appendChild(textarea);
+      textarea.select();
+      success = document.execCommand("copy");
+      document.body.removeChild(textarea);
+    } catch (e2) {
+      console.error("Copy failed completely:", e2);
+    }
+  }
+
+  if (success) {
+    const btn = buttonElement || (typeof event !== "undefined" && event && event.currentTarget) || document.getElementById("copyAddressBtn");
+    if (btn) {
+      const originalHtml = btn.dataset.originalContent || btn.innerHTML;
+      btn.dataset.originalContent = originalHtml;
+      btn.innerHTML = "<span class='copy-icon' aria-hidden='true'>✓</span><span class='copy-label'>Copied!</span>";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        if (btn) {
+          btn.innerHTML = originalHtml;
+          btn.classList.remove("copied");
+        }
+      }, 2000);
+    }
+    showStatusMessage(label + " copied to clipboard!", "success");
+    return true;
+  } else {
+    showStatusMessage("Could not copy to clipboard. Please copy manually.", "error");
+    return false;
+  }
 }

@@ -20,20 +20,25 @@ const updateRegistrationView = (roleNumber) => {
 
 // Sends the selected Shipper or Carrier role to the blockchain.
 const registerAsRole = async (roleNumber) => {
+  const buttons = document.querySelectorAll("#registerChoices button");
   try {
     // A contract call only works after this browser has connected its MetaMask wallet.
     if (!connectedAccount || !escrowContract) {
-      showStatusMessage("Please click Connect wallet first.", "error");
+      showStatusMessage("Please click Connect wallet first.", "warning");
       return;
     }
+
+    buttons.forEach((button) => { button.disabled = true; });
 
     await sendWithEstimatedGas(
       escrowContract.methods.register(roleNumber),
       { from: connectedAccount }
     );
     await refreshPageForRole();
-    showStatusMessage("Registered as " + ROLE_NAMES[roleNumber] + ".");
+    showStatusMessage("Registered as " + ROLE_NAMES[roleNumber] + ".", "success");
+    if (document.body.dataset.page === "portal") window.location.assign("dashboard.html");
   } catch (error) {
     showFriendlyError(error, "Registering this wallet");
+    buttons.forEach((button) => { button.disabled = false; });
   }
 };

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Choose your role · Escrow Logistics</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/home.css" />
+  <link rel="stylesheet" href="css/portal.css" />
+</head>
+<body data-page="portal">
+  <header class="home-header"><div class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark"><svg class="brand-symbol" viewBox="97 399 1052 419" aria-hidden="true"><image href="assets/images/el_logo.png" width="1254" height="1254" /></svg></span><span>Escrow <span class="muted">Logistics</span></span></a>
+    <a class="button button-outline" href="index.html">← Back to home</a>
+  </div></header>
+  <main class="portal-main">
+    <div class="section-heading"><p class="eyebrow">YOUR ESCROW LOGISTICS WORKSPACE</p><h1>Every journey has two sides.<br /><span>Choose yours.</span></h1><p class="home-copy">Connect your wallet, then register the role that fits your work.</p></div>
+    <section class="form-card portal-wallet" aria-labelledby="walletTitle">
+      <div><p class="eyebrow">01 / CONNECT YOUR WALLET</p><h2 id="walletTitle">Your wallet is your account.</h2><p id="account">Wallet not connected</p><p class="form-help" id="portalWalletHelp">Use MetaMask to connect securely to your workspace.</p></div>
+      <button id="portalConnect" class="button button-dark" type="button">Connect MetaMask ↗</button>
+    </section>
+    <p id="portalStatus" class="form-help" role="status" aria-live="polite"></p>
+    <div id="status" class="status-message" role="status" aria-live="polite"></div>
+    <section id="registerChoices" aria-labelledby="roleTitle">
+      <div class="section-heading"><p class="eyebrow">02 / CHOOSE YOUR ROLE</p><h2 id="roleTitle">How will you move things forward?</h2><p class="form-help">Connect your wallet to unlock registration; your role is stored on-chain and can only be registered once.</p></div>
+      <div class="portal-roles">
+        <article class="action-card"><span class="icon-chip green">▤</span><h3>I'm a Shipper</h3><p>Create delivery agreements, fund escrow, and verify milestones before releasing payments.</p><button class="button button-primary" type="button" onclick="registerAsRole(1)" disabled>Register as Shipper →</button></article>
+        <article class="action-card"><span class="icon-chip blue">↗</span><h3>I'm a Carrier</h3><p>View assigned jobs, submit delivery progress, and receive payments for verified milestones.</p><button class="button button-primary" type="button" onclick="registerAsRole(2)" disabled>Register as Carrier →</button></article>
+      </div>
+    </section>
+    <section id="registeredState" class="form-card registered-state hidden">
+      <span class="status-pill status-completed">Ready to go</span><h2 id="registeredRole">Your account</h2><p class="form-help">This wallet already has a registered role; your workspace is ready.</p><a class="button button-primary" href="dashboard.html">Enter dashboard →</a>
+    </section>
+    <p class="form-help portal-note">Connecting only shares your wallet address; registering your role requires a separate transaction approval in MetaMask.</p>
+  </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+  <script src="js/abi.js"></script>
+  <script src="js/utils/profileUtils.js"></script>
+  <script src="js/utils/formatUtils.js"></script>
+  <script src="js/utils/domUtils.js"></script>
+  <script src="js/services/walletConnection.js"></script>
+  <script src="js/services/contractConnection.js"></script>
+  <script src="js/controllers/registerController.js"></script>
+  <script src="js/controllers/portalController.js"></script>
+</body>
+</html>

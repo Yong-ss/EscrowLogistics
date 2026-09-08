@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <script>document.documentElement.classList.add('wallet-pending');</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Refund · Escrow Logistics</title>
@@ -23,8 +24,11 @@
                     Completed agreements cannot be refunded. Already released Carrier
                     payments remain released.
                 </p>
-                <input id="refundId" type="hidden" />
-                <div id="refundAgreementChoices" class="agreement-choices"></div>
+                <div class="field">
+                    <label for="refundId">Select Agreement</label>
+                    <input id="refundId" type="hidden" />
+                    <div id="refundAgreementChoices" class="agreement-choices"></div>
+                </div>
                 <div class="form-actions">
                     <button class="button button-dark" onclick="requestRefund()">
                         Trigger refund →

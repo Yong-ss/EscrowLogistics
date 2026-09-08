@@ -6,7 +6,7 @@ const app = express();
 // Serve all HTML, CSS, and JavaScript files from the frontend folder.
 app.use(express.static(path.join(__dirname, "src")));
 
-// Open the dashboard when someone visits the site's root URL.
+// Open the public homepage when someone visits the site's root URL.
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "src", "index.html"));
 });

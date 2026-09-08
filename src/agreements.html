@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>document.documentElement.classList.add('wallet-pending');</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Agreements · Escrow Logistics</title>
@@ -24,6 +25,37 @@
             </div>
             <span class="section-count" id="agreementCount">—</span>
           </div>
+          <div class="agreement-toolbar">
+            <div class="search-wrap">
+              <span class="search-icon">🔍</span>
+              <input
+                type="text"
+                id="agreementSearchInput"
+                class="search-input"
+                placeholder="Search by name, ID, or address..."
+                oninput="handleAgreementSearch(this.value)"
+              />
+            </div>
+            <div class="sort-wrap">
+              <label for="agreementSortSelect" class="sort-label">Sort:</label>
+              <select id="agreementSortSelect" class="sort-select" onchange="handleAgreementSort(this.value)">
+                <option value="id_desc">ID (Newest first)</option>
+                <option value="id_asc">ID (Oldest first)</option>
+                <option value="deadline_soon">Deadline (Urgent first)</option>
+                <option value="val_high">Value (High to Low)</option>
+                <option value="val_low">Value (Low to High)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-pills" id="statusFilterPills">
+            <button type="button" class="filter-pill active" data-filter="all" onclick="handleAgreementFilter('all')">All</button>
+            <button type="button" class="filter-pill" data-filter="pending" onclick="handleAgreementFilter('pending')">Waiting Acceptance</button>
+            <button type="button" class="filter-pill" data-filter="funded" onclick="handleAgreementFilter('funded')">In Progress (Funded)</button>
+            <button type="button" class="filter-pill" data-filter="completed" onclick="handleAgreementFilter('completed')">Completed</button>
+            <button type="button" class="filter-pill" data-filter="cancelled_refunded" onclick="handleAgreementFilter('cancelled_refunded')">Cancelled / Refunded</button>
+          </div>
+
           <div id="agreementList" class="agreement-list">
             <p class="choice-empty">Connect your wallet to load your agreements.</p>
           </div>

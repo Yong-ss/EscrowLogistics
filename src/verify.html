@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <script>document.documentElement.classList.add('wallet-pending');</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Verify Milestone · Escrow Logistics</title>
@@ -20,11 +21,17 @@
             <section class="form-card" data-role="shipper">
                 <h2>Release the next payment</h2>
                 <p class="form-help">Select an agreement to review the Carrier's completion note and its planned percentage payout.</p>
-                <input id="verifyId" type="hidden" />
-                <div id="verifyAgreementChoices" class="agreement-choices"></div>
-                <div id="verificationMilestone" class="form-help"></div>
-                <div class="form-actions">
-                    <button class="button button-dark" onclick="verifyNextMilestone()">
+                <div class="field">
+                    <label for="verifyId">Select Agreement</label>
+                    <input id="verifyId" type="hidden" />
+                    <div id="verifyAgreementChoices" class="agreement-choices"></div>
+                </div>
+
+                <!-- Animated Milestone Step Progression Tracker -->
+                <div id="shipperMilestoneTracker"></div>
+
+                <div id="verifyActionContainer" class="form-actions hidden">
+                    <button id="verifyReleaseBtn" class="button button-primary" onclick="verifyNextMilestone()">
                         Verify and release →
                     </button>
                 </div>

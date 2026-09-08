@@ -1,12 +1,21 @@
 // Lookup tables + small formatting helpers shared by every controller.
 
 const ROLE_NAMES = ["None", "Shipper", "Carrier"];
-const STATUS_NAMES = ["Created", "Funded", "Completed", "Refunded"];
+const STATUS_NAMES = ["Created", "Funded", "Completed", "Refunded", "Cancelled"];
 
 // shorten an address for table display, e.g. 0xdF61...6ee8
 // Keeps long wallet addresses readable in tables.
 function shortenAddress(address) {
+  if (!address || typeof address !== "string") return "";
+  if (address.length <= 12) return address;
   return address.slice(0, 6) + "..." + address.slice(-4);
+}
+
+// Formats an address as a clean, standardized on-chain hash representation (e.g. 0x5fb9...155b)
+function formatAddressHash(address) {
+  if (!address || typeof address !== "string") return "Wallet not connected";
+  if (address.length <= 14) return address;
+  return address.slice(0, 8) + "..." + address.slice(-6);
 }
 
 // Converts a blockchain event into one short sentence for the history table.
@@ -21,6 +30,8 @@ function formatHistoryEvent(eventRecord, agreementName) {
       return { category: "AGREEMENT", agreement: agreementLabel, detail: "Agreement created and sent to the Carrier for acceptance." };
     case "AgreementAccepted":
       return { category: "AGREEMENT", agreement: agreementLabel, detail: "Carrier accepted the agreement." };
+    case "AgreementCancelled":
+      return { category: "AGREEMENT", agreement: agreementLabel, detail: "Agreement cancelled by the Shipper before funding." };
     case "Funded":
       return { category: "ESCROW", agreement: agreementLabel, detail: "Shipper locked " + web3Client.utils.fromWei(values.amount, "ether") + " ETH in escrow." };
     case "MilestoneSubmitted":

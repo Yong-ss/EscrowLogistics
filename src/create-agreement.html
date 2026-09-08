@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>document.documentElement.classList.add('wallet-pending');</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Create Agreement · Escrow Logistics</title>
@@ -32,15 +33,15 @@
             </div>
             <div class="field">
               <label for="milestoneCount">Milestone count</label>
-              <input id="milestoneCount" type="number" min="1" value="3" />
+              <input id="milestoneCount" type="number" min="1" placeholder="e.g. 2" />
             </div>
             <div class="field">
               <label for="payloadValue">Total escrow amount (ETH)</label>
-              <input id="payloadValue" value="3" />
+              <input id="payloadValue" placeholder="e.g. 1.5" />
             </div>
             <div class="field">
               <label for="deadlineMins">Deadline (minutes)</label>
-              <input id="deadlineMins" type="number" min="1" value="60" />
+              <input id="deadlineMins" type="number" min="1" placeholder="e.g. 60" />
             </div>
           </div>
           <div class="milestone-heading">

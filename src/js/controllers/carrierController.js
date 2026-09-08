@@ -20,21 +20,27 @@ const loadCarrierJobs = async () => {
       if (agreementRecord.carrier.toLowerCase() !== connectedAccount.toLowerCase()) continue;
       carrierAgreements.push(agreementRecord);
 
+      const totalEth = web3Client.utils.fromWei(agreementRecord.totalValue, "ether");
+      const receivedEth = web3Client.utils.fromWei(agreementRecord.amountReleased, "ether");
+      const acceptanceBadge = agreementRecord.carrierAccepted
+        ? "<span class='status-pill status-completed'>Accepted</span>"
+        : "<span class='status-pill status-refunded'>Waiting acceptance</span>";
+
       jobRows.push(
-        "<tr><td>" + agreementRecord.id + "</td>" +
-        "<td>" + agreementRecord.name + "</td>" +
-        "<td>" + shortenAddress(agreementRecord.shipper) + "</td>" +
-        "<td>" + web3Client.utils.fromWei(agreementRecord.totalValue, "ether") + "</td>" +
+        "<tr><td><strong>#" + agreementRecord.id + "</strong></td>" +
+        "<td><strong>" + (typeof escapeHtmlForPage === 'function' ? escapeHtmlForPage(agreementRecord.name) : agreementRecord.name) + "</strong></td>" +
+        "<td><span class='detail-address-row'><code class='address-code' title='" + escapeHtmlForPage(agreementRecord.shipper) + "'>" + shortenAddress(agreementRecord.shipper) + "</code><button type='button' class='button-mini-copy' onclick=\"copyTextToClipboard('" + escapeHtmlForPage(agreementRecord.shipper) + "', 'Shipper address', this)\" title='Copy full Shipper address'>📋 Copy</button></span></td>" +
+        "<td>" + totalEth + " ETH</td>" +
         "<td>" + agreementRecord.milestonesDone + " / " + agreementRecord.milestoneCount + "</td>" +
-        "<td>" + web3Client.utils.fromWei(agreementRecord.amountReleased, "ether") + "</td>" +
-        "<td>" + (agreementRecord.carrierAccepted ? "Accepted" : "Waiting for acceptance") + "</td></tr>"
+        "<td>" + receivedEth + " ETH</td>" +
+        "<td>" + acceptanceBadge + "</td></tr>"
       );
     }
 
     document.querySelector("#jobsTable tbody").innerHTML =
       jobRows.length ? jobRows.join("") : "<tr><td colspan='7'>No jobs assigned to you yet.</td></tr>";
     updateCarrierAgreementOptions(carrierAgreements);
-    showStatusMessage("Loaded " + jobRows.length + " job(s).");
+    showStatusMessage("Loaded " + jobRows.length + " job(s).", "info");
   } catch (error) {
     showFriendlyError(error, "Loading your jobs");
   }
@@ -46,7 +52,9 @@ const updateCarrierAgreementOptions = (agreements) => {
   const submitChoices = document.getElementById("submitAgreementChoices");
   if (!acceptChoices || !submitChoices) return;
 
-  const pendingAgreements = agreements.filter((agreement) => !agreement.carrierAccepted);
+  const pendingAgreements = agreements.filter(
+    (agreement) => Number(agreement.status) === 0 && !agreement.carrierAccepted
+  );
   const fundedAgreements = agreements.filter(
     (agreement) => agreement.carrierAccepted && Number(agreement.status) === 1
   );
@@ -61,12 +69,18 @@ const renderAgreementChoices = (action, agreements, container) => {
     container.innerHTML = action === "accept"
       ? "<p class='choice-empty'>No agreement waiting for acceptance.</p>"
       : "<p class='choice-empty'>No funded agreement available yet.</p>";
+    if (action === "submit") {
+      const tracker = document.getElementById("carrierMilestoneTracker");
+      if (tracker) tracker.innerHTML = "";
+      const form = document.getElementById("milestoneSubmitForm");
+      if (form) form.classList.add("hidden");
+    }
     return;
   }
 
   container.innerHTML = agreements.map((agreement) =>
     "<button type='button' class='agreement-choice' onclick=\"chooseCarrierAgreement('" + action + "', '" + agreement.id + "')\">" +
-    "<span><strong>" + agreement.name + "</strong><small>Agreement #" + agreement.id + "</small></span>" +
+    "<span><strong>" + (typeof escapeHtmlForPage === 'function' ? escapeHtmlForPage(agreement.name) : agreement.name) + "</strong><small>Agreement #" + agreement.id + "</small></span>" +
     "<span class='choice-arrow'>→</span></button>"
   ).join("");
 
@@ -90,39 +104,66 @@ const chooseCarrierAgreement = (action, agreementId) => {
 const acceptCarrierAgreement = async () => {
   try {
     const agreementId = document.getElementById("acceptAgreementId").value;
+    if (!agreementId) {
+      showStatusMessage("Please select an agreement to accept.", "required");
+      return;
+    }
     await sendWithEstimatedGas(
       escrowContract.methods.acceptAgreement(agreementId),
       { from: connectedAccount }
     );
-    showStatusMessage("Agreement " + agreementId + " accepted.");
+    showStatusMessage("Agreement " + agreementId + " accepted.", "success");
     await loadCarrierJobs();
   } catch (error) {
     showFriendlyError(error, "Accepting the agreement");
   }
 };
 
-// Shows the next milestone so the Carrier knows exactly what to report.
+// Shows the milestone step progression so the Carrier knows exactly what to report.
 const loadCurrentMilestone = async () => {
   try {
     const agreementId = document.getElementById("submitAgreementId").value;
+    const trackerContainer = document.getElementById("carrierMilestoneTracker");
+    const submitForm = document.getElementById("milestoneSubmitForm");
+    const submitBtn = document.getElementById("submitMilestoneBtn");
+    if (!agreementId || !trackerContainer) return;
+
     const agreementRecord = await escrowContract.methods.getAgreement(agreementId).call();
+    const milestoneCount = Number(agreementRecord.milestoneCount);
     const currentIndex = Number(agreementRecord.milestonesDone);
 
-    if (currentIndex >= Number(agreementRecord.milestoneCount)) {
-      document.getElementById("currentMilestone").innerHTML = "All milestones are already verified.";
-      return;
+    // Fetch all milestones for this agreement to show the full journey
+    const milestones = [];
+    for (let i = 0; i < milestoneCount; i++) {
+      const m = await escrowContract.methods.getMilestone(agreementId, i).call();
+      milestones.push(m);
     }
 
-    const milestone = await escrowContract.methods.getMilestone(agreementId, currentIndex).call();
-    const noteText = milestone.submitted
-      ? "Carrier note: " + milestone.submissionNote
-      : "Waiting for your completion note.";
+    // Render interactive animated stepper
+    renderMilestoneStepTracker(trackerContainer, agreementRecord, milestones, { role: "carrier" });
 
-    document.getElementById("currentMilestone").innerHTML =
-      "<strong>Milestone " + (currentIndex + 1) + ": " + milestone.name + "</strong><br>" +
-      milestone.description + "<br>" + noteText;
+    // Manage completion note form visibility and button state
+    if (submitForm) {
+      if (currentIndex >= milestoneCount) {
+        submitForm.classList.add("hidden");
+      } else {
+        submitForm.classList.remove("hidden");
+        const activeMilestone = milestones[currentIndex];
+        if (activeMilestone && activeMilestone.submitted) {
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Milestone already submitted (Under Shipper Review)";
+          }
+        } else {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Submit milestone #" + (currentIndex + 1) + " for review →";
+          }
+        }
+      }
+    }
   } catch (error) {
-    showFriendlyError(error, "Loading the milestone");
+    showFriendlyError(error, "Loading the milestone progression");
   }
 };
 
@@ -133,7 +174,7 @@ const submitCurrentMilestone = async () => {
     const note = document.getElementById("completionNote").value.trim();
 
     if (!note) {
-      showStatusMessage("Please write a completion note first.", "error");
+      showStatusMessage("Please write a completion note first.", "required");
       return;
     }
 
@@ -143,7 +184,7 @@ const submitCurrentMilestone = async () => {
     );
 
     document.getElementById("completionNote").value = "";
-    showStatusMessage("Milestone submitted for Shipper review.");
+    showStatusMessage("Milestone submitted for Shipper review.", "success");
     await loadCurrentMilestone();
   } catch (error) {
     showFriendlyError(error, "Submitting the milestone");

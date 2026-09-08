@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>document.documentElement.classList.add('wallet-pending');</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>My Jobs · Escrow Logistics</title>
@@ -17,14 +18,25 @@
           reputation.
         </p>
         <section class="table-card" data-role="carrier">
-          <h2>Carrier dashboard</h2>
-          <p>
-            Reputation points:
-            <strong id="repPoints">0</strong>
-          </p>
-          <button class="button button-dark" onclick="loadCarrierJobs()">
-            Refresh jobs
-          </button>
+          <div class="card-header-bar">
+            <div>
+              <h2>Carrier dashboard</h2>
+              <p class="section-subtitle">
+                Track agreements assigned to your wallet, released earnings, and reputation.
+              </p>
+            </div>
+            <div class="card-header-actions">
+              <div class="reputation-badge">
+                <span>⭐</span>
+                <span>Reputation:</span>
+                <strong id="repPoints">0</strong>
+                <small>pts</small>
+              </div>
+              <button class="button button-secondary button-sm" onclick="loadCarrierJobs()">
+                ↻ Refresh jobs
+              </button>
+            </div>
+          </div>
           <table class="data-table" id="jobsTable">
             <thead>
               <tr>
@@ -44,35 +56,41 @@
           <h2>Accept an agreement</h2>
           <p class="form-help">Accept the assignment before the Shipper funds it.</p>
           <div class="field">
-            <label for="acceptAgreementId">Agreement ID</label>
+            <label for="acceptAgreementId">Select Agreement</label>
             <input id="acceptAgreementId" type="hidden" />
             <div id="acceptAgreementChoices" class="agreement-choices"></div>
           </div>
-          <button class="button button-dark" onclick="acceptCarrierAgreement()">
-            Accept agreement
-          </button>
+          <div class="form-actions">
+            <button class="button button-dark" onclick="acceptCarrierAgreement()">
+              Accept agreement →
+            </button>
+          </div>
         </section>
         <section class="form-card carrier-form-card" data-role="carrier">
           <h2>Submit milestone</h2>
           <p class="form-help">
-            Tell the Shipper what you completed before they release the next payment.
+            Select an active agreement to view its step progression and submit your completion report.
           </p>
           <div class="field">
-            <label for="submitAgreementId">Agreement ID</label>
+            <label for="submitAgreementId">Select Agreement</label>
             <input id="submitAgreementId" type="hidden" />
             <div id="submitAgreementChoices" class="agreement-choices"></div>
           </div>
-          <button class="button button-light" onclick="loadCurrentMilestone()">
-            Show current milestone
-          </button>
-          <div id="currentMilestone" class="form-help"></div>
-          <div class="field">
-            <label for="completionNote">Completion note</label>
-            <textarea id="completionNote" rows="4" required placeholder="What did you complete?"></textarea>
+
+          <!-- Animated Milestone Step Progression Tracker -->
+          <div id="carrierMilestoneTracker"></div>
+
+          <div id="milestoneSubmitForm" class="milestone-submit-form hidden">
+            <div class="field">
+              <label for="completionNote">Completion note <span class="required-star">*</span></label>
+              <textarea id="completionNote" rows="3" required placeholder="Describe the work completed, waybill details, or delivery confirmation..."></textarea>
+            </div>
+            <div class="form-actions">
+              <button id="submitMilestoneBtn" class="button button-dark" onclick="submitCurrentMilestone()">
+                Submit milestone for Shipper review →
+              </button>
+            </div>
           </div>
-          <button class="button button-dark" onclick="submitCurrentMilestone()">
-            Submit milestone
-          </button>
         </section>
         <div id="status" class="status-message"></div>
       </div>
