@@ -47,7 +47,7 @@ function getOrCreateToastContainer() {
   return container;
 }
 
-// Shows a modern notification alert (floating toast + formatted inline status)
+// Shows a modern floating toast notification.
 function showStatusMessage(message, rawType = "info") {
   if (!message) return;
 
@@ -60,44 +60,7 @@ function showStatusMessage(message, rawType = "info") {
   const theme = NOTIFICATION_THEMES[type];
   const safeText = typeof escapeHtmlForPage === "function" ? escapeHtmlForPage(message) : message;
 
-  // 1. Update inline #status element if present on the page
-  const statusEl = document.getElementById("status");
-  if (statusEl) {
-    if (statusEl._dismissTimer) clearTimeout(statusEl._dismissTimer);
-    statusEl.classList.remove("status-fade-out");
-    statusEl.className = "status-message " + theme.statusClass;
-    statusEl.innerHTML = `
-      <span class="status-icon" aria-hidden="true">${theme.icon}</span>
-      <div class="status-content">
-        <strong class="status-label">${theme.label}:</strong>
-        <span class="status-text">${safeText}</span>
-      </div>
-      <button type="button" class="status-close-btn" aria-label="Close notification">✕</button>
-    `;
-
-    // Manual close button
-    const statusCloseBtn = statusEl.querySelector(".status-close-btn");
-    if (statusCloseBtn) {
-      statusCloseBtn.addEventListener("click", () => dismissStatusElement(statusEl));
-    }
-
-    // Auto dismiss after 4.5 seconds
-    statusEl._dismissTimer = setTimeout(() => {
-      dismissStatusElement(statusEl);
-    }, 4500);
-
-    // Pause timer on hover, resume on mouse leave
-    statusEl.onmouseenter = () => {
-      if (statusEl._dismissTimer) clearTimeout(statusEl._dismissTimer);
-    };
-    statusEl.onmouseleave = () => {
-      statusEl._dismissTimer = setTimeout(() => {
-        dismissStatusElement(statusEl);
-      }, 2000);
-    };
-  }
-
-  // 2. Spawn modern floating toast with optimal visual proximity
+  // Spawn the floating toast with optimal visual proximity.
   const container = getOrCreateToastContainer();
 
   // Limit stacked toasts to 4
@@ -133,21 +96,6 @@ function showStatusMessage(message, rawType = "info") {
   toast.addEventListener("mouseleave", () => {
     dismissTimer = setTimeout(() => dismissToast(toast), 2500);
   });
-}
-
-// Dismisses the inline status banner with a smooth fade-out
-function dismissStatusElement(statusEl) {
-  if (!statusEl) return;
-  if (statusEl._dismissTimer) {
-    clearTimeout(statusEl._dismissTimer);
-    statusEl._dismissTimer = null;
-  }
-  statusEl.classList.add("status-fade-out");
-  setTimeout(() => {
-    statusEl.innerHTML = "";
-    statusEl.className = "status-message";
-    statusEl.classList.remove("status-fade-out");
-  }, 250);
 }
 
 function dismissToast(toast) {

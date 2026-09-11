@@ -260,13 +260,30 @@ const printBillOfLading = () => {
 
 // Builds a readable history timeline for the selected agreement only.
 const loadAgreementHistory = async (agreementId, agreementName = "") => {
+  const historyList = document.getElementById("historyList");
+  if (historyList) {
+    historyList.innerHTML = "<div class='history-loading' role='status' aria-live='polite'><span class='history-loading-spinner' aria-hidden='true'></span><span>Loading agreement activity...</span></div>";
+  }
+
   try {
-    // Public RPC nodes limit event searches, so only read the latest 10,000 blocks.
+    // Read the complete contract history in RPC-safe chunks so older agreements remain visible.
     const latestBlock = await web3Client.eth.getBlockNumber();
-    const pastEvents = await escrowContract.getPastEvents("allEvents", {
-      fromBlock: Math.max(0, latestBlock - 9999),
-      toBlock: latestBlock,
-    });
+    const pastEvents = [];
+    let toBlock = latestBlock;
+    let chunkSize = 10000;
+    while (toBlock >= 0) {
+      const fromBlock = Math.max(0, toBlock - chunkSize + 1);
+      try {
+        const chunk = await escrowContract.getPastEvents("allEvents", { fromBlock, toBlock });
+        pastEvents.push(...chunk);
+        if (chunk.some((eventRecord) => eventRecord.event === "AgreementCreated" &&
+          String(eventRecord.returnValues.id) === String(agreementId))) break;
+        toBlock = fromBlock - 1;
+      } catch (error) {
+        if (chunkSize <= 500) throw error;
+        chunkSize = Math.floor(chunkSize / 2);
+      }
+    }
 
     // An agreement ID is unique, so this removes events from every other agreement.
     const relevantEvents = pastEvents
@@ -275,7 +292,6 @@ const loadAgreementHistory = async (agreementId, agreementName = "") => {
       .sort((first, second) => Number(first.blockNumber) - Number(second.blockNumber) ||
         Number(first.logIndex) - Number(second.logIndex));
 
-    const historyList = document.getElementById("historyList");
     if (!historyList) return;
     const historyItems = await Promise.all(relevantEvents.map(async (eventRecord) => {
       const formatted = formatHistoryEvent(eventRecord, agreementName);

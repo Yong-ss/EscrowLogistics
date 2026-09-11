@@ -603,10 +603,6 @@ body {
     font-weight: 700;
 }
 
-.status-text {
-    font-size: 13.5px;
-}
-
 /* 1. Information (Light Blue) */
 .status-message.info,
 .status-message.information {
@@ -744,6 +740,29 @@ body {
 .toast-text {
     font-size: 13px;
     font-weight: 500;
+}
+
+.history-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 96px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.history-loading-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #dbeafe;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: history-loading-spin 0.75s linear infinite;
+}
+
+@keyframes history-loading-spin {
+    to { transform: rotate(360deg); }
 }
 
 .toast-close-btn {
