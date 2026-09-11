@@ -223,7 +223,7 @@ const loadAgreementDetails = async (agreementId, knownAgreement = null) => {
       if ((label === "Shipper" || label === "Carrier") && typeof value === "string" && value.startsWith("0x")) {
         valueHtml = "<span class='detail-address-row'>" +
           "<code class='address-code' title='" + escapeHtmlForPage(value) + "'>" + (typeof shortenAddress === "function" ? shortenAddress(value) : value) + "</code>" +
-          "<button type='button' class='button-mini-copy' onclick=\"copyTextToClipboard('" + escapeHtmlForPage(value) + "', '" + label + " address', this)\" title='Copy full " + label + " address'>📋 Copy</button>" +
+          "<button type='button' class='button-mini-copy' onclick=\"copyTextToClipboard('" + escapeHtmlForPage(value) + "', '" + label + " address', this)\" title='Copy full " + label + " address'>Copy</button>" +
           "</span>";
       }
       return "<div class='detail-item'><span>" + label + "</span><strong>" + valueHtml + "</strong></div>";

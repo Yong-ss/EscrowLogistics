@@ -536,7 +536,7 @@ async function copyTextToClipboard(text, label = "Wallet address", buttonElement
     if (btn) {
       const originalHtml = btn.dataset.originalContent || btn.innerHTML;
       btn.dataset.originalContent = originalHtml;
-      btn.innerHTML = "<span class='copy-icon' aria-hidden='true'>✓</span><span class='copy-label'>Copied!</span>";
+      btn.innerHTML = "<span class='copy-label'>Copied!</span>";
       btn.classList.add("copied");
       setTimeout(() => {
         if (btn) {

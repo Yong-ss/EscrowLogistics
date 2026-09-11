@@ -18,6 +18,7 @@ const loadCarrierJobs = async () => {
     for (let agreementId = 1; agreementId <= totalAgreementCount; agreementId++) {
       const agreementRecord = await escrowContract.methods.getAgreement(agreementId).call();
       if (agreementRecord.carrier.toLowerCase() !== connectedAccount.toLowerCase()) continue;
+      if (Number(agreementRecord.status) === 4) continue;
       carrierAgreements.push(agreementRecord);
 
       const totalEth = web3Client.utils.fromWei(agreementRecord.totalValue, "ether");
@@ -29,7 +30,7 @@ const loadCarrierJobs = async () => {
       jobRows.push(
         "<tr><td><strong>#" + agreementRecord.id + "</strong></td>" +
         "<td><strong>" + (typeof escapeHtmlForPage === 'function' ? escapeHtmlForPage(agreementRecord.name) : agreementRecord.name) + "</strong></td>" +
-        "<td><span class='detail-address-row'><code class='address-code' title='" + escapeHtmlForPage(agreementRecord.shipper) + "'>" + shortenAddress(agreementRecord.shipper) + "</code><button type='button' class='button-mini-copy' onclick=\"copyTextToClipboard('" + escapeHtmlForPage(agreementRecord.shipper) + "', 'Shipper address', this)\" title='Copy full Shipper address'>📋 Copy</button></span></td>" +
+        "<td><span class='detail-address-row'><code class='address-code' title='" + escapeHtmlForPage(agreementRecord.shipper) + "'>" + shortenAddress(agreementRecord.shipper) + "</code><button type='button' class='button-mini-copy' onclick=\"copyTextToClipboard('" + escapeHtmlForPage(agreementRecord.shipper) + "', 'Shipper address', this)\" title='Copy full Shipper address'>Copy</button></span></td>" +
         "<td>" + totalEth + " ETH</td>" +
         "<td>" + agreementRecord.milestonesDone + " / " + agreementRecord.milestoneCount + "</td>" +
         "<td>" + receivedEth + " ETH</td>" +

@@ -77,12 +77,9 @@
               <label for="profileAccount">Wallet Address</label>
               <div class="address-copy-bar">
                 <div class="address-hash-wrap" onclick="toggleAddressDisplay('profileAccount', 'addressHashBadge')" title="Click to toggle shortened hash / full address">
-                  <span class="wallet-hash-icon" aria-hidden="true">🔑</span>
                   <code id="profileAccount" class="address-hash">Wallet not connected</code>
-                  <span id="addressHashBadge" class="address-hash-badge hidden">HASH</span>
                 </div>
                 <button type="button" id="copyAddressBtn" class="button-copy" onclick="copyWalletAddress()" title="Copy full wallet address" disabled>
-                  <span class="copy-icon" aria-hidden="true">📋</span>
                   <span class="copy-label">Copy</span>
                 </button>
               </div>

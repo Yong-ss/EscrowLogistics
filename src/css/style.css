@@ -1736,6 +1736,7 @@ body[data-page="agreement-details"] .agreement-history-card {
 }
 
 .profile-card {
+    min-width: 0;
     width: 100%;
 }
 
@@ -1743,7 +1744,15 @@ body[data-page="agreement-details"] .agreement-history-card {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    min-width: 0;
     width: 100%;
+}
+
+.profile-card input,
+.profile-card .avatar-dropzone,
+.profile-card .field {
+    max-width: 100%;
+    min-width: 0;
 }
 
 .profile-identity {
@@ -1978,6 +1987,13 @@ img.profile-avatar {
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.08));
 }
 
+.network-switch-icon {
+    color: #16704f;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+}
+
 .address-code {
     background: #f1f5f3;
     border: 1px solid #dce5df;
@@ -2063,7 +2079,7 @@ img.profile-avatar {
     gap: 6px;
     background: #ffffff;
     border: 1px solid #dce5df;
-    border-radius: 6px;
+    border-radius: 7px;
     padding: 6px 12px;
     font-size: 12.5px;
     font-weight: 600;
@@ -2072,15 +2088,14 @@ img.profile-avatar {
     white-space: nowrap;
     flex-shrink: 0;
     transition: all 0.18s ease;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    box-shadow: none;
 }
 
 .button-copy:hover:not(:disabled) {
     background: #f0fdf4;
     border-color: #86efac;
     color: #166534;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
 }
 
 .button-copy:active:not(:disabled) {
