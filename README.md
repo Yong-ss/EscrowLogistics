@@ -30,55 +30,28 @@ GitHub repository: [EscrowLogistics](https://github.com/Yong-ss/EscrowLogistics)
 
 ```text
 EscrowLogistics/
-├── .gitignore                    # Files that should not be committed
-├── contracts/
-│   ├── EscrowLogistics.sol        # escrow, roles, milestones, payouts, and refunds
-│   └── Migrations.sol             # Truffle migration helper contract
-├── migrations/
-│   ├── 1_initial_migration.js    # Deploys the Truffle Migrations contract
-│   └── 2_deploy_contracts.js     # Deploys the EscrowLogistics contract
+├── assets/                         # Source 3D model, logos, and material textures
+├── contracts/                      # Solidity smart contracts
+├── migrations/                     # Truffle deployment scripts
 ├── src/
-│   ├── agreement-details.html     # Shows one agreement's details and history
-│   ├── agreements.html            # Shows the connected wallet's agreements
-│   ├── carrier-jobs.html          # Carrier accepts jobs and submits milestones
-│   ├── create-agreement.html      # Shipper creates an agreement
-│   ├── fund.html                  # Shipper funds an accepted agreement
-│   ├── index.html                 # Main role-based dashboard
-│   ├── profile.html               # Browser-based profile information
-│   ├── refund.html                # Deadline refund action for the Shipper
-│   ├── register.html              # Wallet registration and role selection
-│   ├── verify.html                # Shipper verifies submitted milestones
-│   ├── css/
-│   │   └── style.css              # Shared layout, form, card, and page styling
+│   ├── assets/                     # Frontend copies of images, model, and textures
+│   ├── *.html                      # Application pages (dashboard, portal, agreements, jobs, profile, etc.)
+│   ├── css/                        # Shared, landing-page, and portal styles
 │   ├── js/
-│   │   ├── abi.js                 # Contract ABI and deployed contract address
-│   │   ├── siteShell.js           # Loads shared HTML partials and page shell setup
-│   │   ├── controllers/
-│   │   │   ├── agreementController.js # Agreement list, details, and history actions
-│   │   │   ├── carrierController.js   # Carrier jobs, acceptance, and submissions
-│   │   │   ├── pageController.js       # Role-based page access and page loading
-│   │   │   ├── profileController.js    # Profile form and avatar actions
-│   │   │   ├── registerController.js   # User role registration actions
-│   │   │   └── shipperController.js    # Agreement, funding, verification, and refund actions
-│   │   ├── services/
-│   │   │   ├── contractConnection.js  # Creates the Web3 smart contract connection
-│   │   │   └── walletConnection.js     # Connects MetaMask and tracks the wallet
-│   │   └── utils/
-│   │       ├── domUtils.js             # DOM updates and readable blockchain errors
-│   │       ├── formatUtils.js          # Formats roles, statuses, and blockchain events
-│   │       ├── milestoneUtils.js       # Builds and reads milestone form fields
-│   │       └── profileUtils.js         # Saves and loads browser profile data
-│   └── partials/
-│       ├── footer.html             # Shared page footer
-│       ├── header.html             # Shared page header and wallet area
-│       └── sidebar.html            # Shared role-based navigation sidebar
-├── package-lock.json               # Locked npm dependency versions
-├── package.json                    # Project scripts and npm dependencies
+│   │   ├── abi.js                  # Contract ABI and deployed address
+│   │   ├── home.js                 # Landing page initialization
+│   │   ├── homeMotion.js            # Landing page motion
+│   │   ├── truckScene.js            # Three.js logistics truck scene
+│   │   ├── controllers/             # Page, role, agreement, profile, and operation controllers
+│   │   ├── services/                # MetaMask and smart-contract connections
+│   │   ├── utils/                   # Formatting, DOM, milestone, and profile helpers
+│   │   └── vendor/                  # Three.js and model-loader libraries
+│   └── partials/                    # Shared header, sidebar, and footer
+├── package.json                    # Project scripts and dependencies
 ├── README.md                       # Project description and setup instructions
-├── server.js                       # Express static server on port 5000
+├── server.js                       # Express static server
 └── truffle-config.js               # Ganache and Sepolia network settings
 ```
-
 ## Run the existing Sepolia deployment
 
 This is the normal setup for using the shared dApp. Users do not need Ganache, Truffle deployment, or a mnemonic.
@@ -149,3 +122,4 @@ Copy the local contract address into `src/js/abi.js` before using the local netw
 - Ether values are entered in Ether in the frontend and converted to Wei before contract calls.
 - Milestone payout amounts are calculated from the declared total and stored payout percentages; users do not manually enter each payment amount.
 - The contract records business state and events on-chain. Personal Profile fields are intentionally local browser data and are not public blockchain data.
+
